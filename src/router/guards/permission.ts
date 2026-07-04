@@ -10,7 +10,7 @@ import { addRecentMenu } from "@/composables/useRecentMenus";
  * 处理登录验证、动态路由生成、404检测等
  */
 export function setupPermissionGuard() {
-  const whiteList = ["/login"];
+  const whiteList = ["/login", "/oauth/callback"];
 
   router.beforeEach(async (to, _from) => {
     NProgress.start();

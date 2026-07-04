@@ -3,6 +3,9 @@ import type {
   LoginRequest,
   LoginResponse,
   CaptchaInfo,
+  OAuthAuthUrlResponse,
+  OAuthExchangeRequest,
+  OAuthProvider,
   PublicKeyResponse,
   RefreshTokenRequest,
   RefreshTokenResponse,
@@ -73,6 +76,23 @@ const AuthAPI = {
     return request<unknown, UserProfile>({
       url: `${AUTH_BASE_URL}/profile`,
       method: "get",
+    });
+  },
+
+  /** 获取 OAuth 授权 URL */
+  getOAuthAuthUrl(provider: OAuthProvider) {
+    return request<unknown, OAuthAuthUrlResponse>({
+      url: `${AUTH_BASE_URL}/oauth/${provider}/auth-url`,
+      method: "get",
+    });
+  },
+
+  /** 用一次性交换码换取 JWT */
+  exchangeOAuthCode(data: OAuthExchangeRequest) {
+    return request<unknown, LoginResponse>({
+      url: `${AUTH_BASE_URL}/oauth/exchange`,
+      method: "post",
+      data,
     });
   },
 };

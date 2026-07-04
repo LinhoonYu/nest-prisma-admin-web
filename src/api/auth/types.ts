@@ -101,3 +101,18 @@ export interface UserProfile {
   /** 权限编码集合 */
   permissions: string[];
 }
+
+/** OAuth 提供商 */
+export type OAuthProvider = "google" | "github" | "gitee";
+
+/** OAuth 授权 URL 响应 */
+export interface OAuthAuthUrlResponse {
+  /** 授权 URL */
+  url: string;
+}
+
+/** OAuth 交换码请求参数 */
+export interface OAuthExchangeRequest {
+  /** 一次性交换码 */
+  code: string;
+}

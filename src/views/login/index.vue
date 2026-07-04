@@ -126,13 +126,29 @@
               <div class="login-alt">
                 <div class="login-alt__divider">其他登录方式</div>
                 <div class="login-alt__buttons">
-                  <button class="login-alt__btn">
-                    <span class="login-alt__icon i-svg:qr-code" />
-                    扫码登录
+                  <button
+                    class="login-alt__btn"
+                    :disabled="oauthLoading === 'google'"
+                    @click="handleOAuthLogin('google')"
+                  >
+                    <span class="login-alt__icon i-svg:google" />
+                    Google
                   </button>
-                  <button class="login-alt__btn">
-                    <span class="login-alt__icon i-svg:security" />
-                    统一认证
+                  <button
+                    class="login-alt__btn"
+                    :disabled="oauthLoading === 'github'"
+                    @click="handleOAuthLogin('github')"
+                  >
+                    <span class="login-alt__icon i-svg:github" />
+                    GitHub
+                  </button>
+                  <button
+                    class="login-alt__btn"
+                    :disabled="oauthLoading === 'gitee'"
+                    @click="handleOAuthLogin('gitee')"
+                  >
+                    <span class="login-alt__icon i-svg:gitee" />
+                    Gitee
                   </button>
                 </div>
               </div>
@@ -159,7 +175,7 @@ defineOptions({ name: "LoginPage", inheritAttrs: false });
 import { Clock, Lock, Loading, Refresh, User } from "@element-plus/icons-vue";
 import type { FormInstance } from "element-plus";
 import AuthAPI from "@/api/auth";
-import type { LoginRequest } from "@/api/auth";
+import type { LoginRequest, OAuthProvider } from "@/api/auth";
 import router from "@/router";
 import { useUserStore } from "@/stores";
 import { AuthStorage } from "@/utils/auth";
@@ -175,6 +191,7 @@ const component = ref<"login" | "resetPwd">("login");
 
 const loginFormRef = ref<FormInstance>();
 const loading = ref(false);
+const oauthLoading = ref<OAuthProvider | null>(null);
 const isCapsLock = ref(false);
 const captchaSvg = ref<string>();
 const codeLoading = ref(false);
@@ -262,6 +279,16 @@ function checkCapsLock(event: KeyboardEvent) {
 
 function showForm(type: "resetPwd") {
   component.value = type;
+}
+
+async function handleOAuthLogin(provider: OAuthProvider) {
+  oauthLoading.value = provider;
+  try {
+    const { url } = await AuthAPI.getOAuthAuthUrl(provider);
+    window.location.href = url;
+  } catch {
+    oauthLoading.value = null;
+  }
 }
 
 onMounted(() => {
