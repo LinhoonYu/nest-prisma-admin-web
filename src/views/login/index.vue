@@ -233,10 +233,9 @@ async function handleLoginSubmit() {
   try {
     const formData: LoginRequest = { ...loginFormData.value };
 
-    // RSA 启用时加密密码，清除明文
+    // RSA 启用时加密密码，密文直接放入 password 字段
     if (rsaPublicKey.value && formData.password) {
-      formData.encPassword = await rsaEncrypt(rsaPublicKey.value, formData.password);
-      formData.password = undefined;
+      formData.password = await rsaEncrypt(rsaPublicKey.value, formData.password);
     }
 
     await userStore.login(formData).then(

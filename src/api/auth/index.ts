@@ -16,17 +16,11 @@ const AuthAPI = {
   login(data: LoginRequest) {
     const payload: Pick<
       LoginRequest,
-      "username" | "password" | "encPassword" | "captchaKey" | "captchaCode"
+      "username" | "password" | "captchaKey" | "captchaCode"
     > = {
       username: data.username,
+      password: data.password,
     };
-
-    // 密码字段：RSA 加密时传 encPassword，否则传 password
-    if (data.encPassword) {
-      payload.encPassword = data.encPassword;
-    } else if (data.password) {
-      payload.password = data.password;
-    }
 
     if (data.captchaKey) payload.captchaKey = data.captchaKey;
     if (data.captchaCode) payload.captchaCode = data.captchaCode;

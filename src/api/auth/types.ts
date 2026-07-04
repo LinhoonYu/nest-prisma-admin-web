@@ -8,10 +8,8 @@
 export interface LoginRequest {
   /** 用户名 */
   username: string;
-  /** 明文密码（RSA 关闭时使用） */
-  password?: string;
-  /** RSA 加密后的密码（Base64 编码，RSA 启用时必传） */
-  encPassword?: string;
+  /** 密码（RSA 关闭时为明文，开启时为加密密文） */
+  password: string;
   /** 验证码缓存 key */
   captchaKey?: string;
   /** 验证码 */
