@@ -4,11 +4,13 @@
 
 <script setup lang="ts">
 import * as echarts from "echarts/core";
-import { BarChart, LineChart, PieChart } from "echarts/charts";
+import { BarChart, LineChart, PieChart, MapChart } from "echarts/charts";
 import {
   GridComponent,
   TooltipComponent,
   LegendComponent,
+  GeoComponent,
+  VisualMapComponent,
 } from "echarts/components";
 import { CanvasRenderer } from "echarts/renderers";
 import { useResizeObserver } from "@vueuse/core";
@@ -18,9 +20,12 @@ echarts.use([
   BarChart,
   LineChart,
   PieChart,
+  MapChart,
   GridComponent,
   TooltipComponent,
   LegendComponent,
+  GeoComponent,
+  VisualMapComponent,
 ]);
 
 const props = defineProps<{
