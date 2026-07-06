@@ -1,11 +1,15 @@
 import request from "@/utils/request";
 import type {
+  BindIdentityRequest,
+  CaptchaInfo,
+  LinkExistingRequest,
   LoginRequest,
   LoginResponse,
-  CaptchaInfo,
   OAuthAuthUrlResponse,
   OAuthExchangeRequest,
+  OAuthIdentity,
   OAuthProvider,
+  OAuthRegisterRequest,
   PublicKeyResponse,
   RefreshTokenRequest,
   RefreshTokenResponse,
@@ -80,10 +84,11 @@ const AuthAPI = {
   },
 
   /** 获取 OAuth 授权 URL */
-  getOAuthAuthUrl(provider: OAuthProvider) {
+  getOAuthAuthUrl(provider: OAuthProvider, mode?: "login" | "bind") {
     return request<unknown, OAuthAuthUrlResponse>({
       url: `${AUTH_BASE_URL}/oauth/${provider}/auth-url`,
       method: "get",
+      params: mode ? { mode } : undefined,
     });
   },
 
@@ -93,6 +98,49 @@ const AuthAPI = {
       url: `${AUTH_BASE_URL}/oauth/exchange`,
       method: "post",
       data,
+    });
+  },
+
+  /** 首次 OAuth 登录：创建新账号 */
+  registerOAuthAccount(data: OAuthRegisterRequest) {
+    return request<unknown, LoginResponse>({
+      url: `${AUTH_BASE_URL}/oauth/register`,
+      method: "post",
+      data,
+    });
+  },
+
+  /** 首次 OAuth 登录：关联已有账号 */
+  linkExistingOAuth(data: LinkExistingRequest) {
+    return request<unknown, LoginResponse>({
+      url: `${AUTH_BASE_URL}/oauth/link-existing`,
+      method: "post",
+      data,
+    });
+  },
+
+  /** 绑定第三方账号 */
+  bindOAuthIdentity(data: BindIdentityRequest) {
+    return request({
+      url: `${AUTH_BASE_URL}/oauth/bind`,
+      method: "post",
+      data,
+    });
+  },
+
+  /** 解绑第三方账号 */
+  unbindOAuthIdentity(identityId: string) {
+    return request({
+      url: `${AUTH_BASE_URL}/oauth/identities/${identityId}`,
+      method: "delete",
+    });
+  },
+
+  /** 查询已绑定的第三方账号 */
+  getOAuthIdentities() {
+    return request<unknown, OAuthIdentity[]>({
+      url: `${AUTH_BASE_URL}/oauth/identities`,
+      method: "get",
     });
   },
 };

@@ -46,7 +46,6 @@ const FORCE_LOGIN_CODES = new Set<number>([
   ApiCodeEnum.REFRESH_TOKEN_REUSE_DETECTED,
   ApiCodeEnum.SESSION_EXPIRED,
   ApiCodeEnum.SESSION_REVOKED,
-  ApiCodeEnum.TOKEN_BLACKLISTED,
   ApiCodeEnum.TOKEN_MISSING,
 ]);
 

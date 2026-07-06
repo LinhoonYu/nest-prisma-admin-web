@@ -127,6 +127,7 @@ function transformProfileToUserInfo(profile: UserProfile): UserInfo {
     username: profile.username,
     nickname: profile.nickname ?? undefined,
     avatarFileId: profile.avatarFileId ?? undefined,
+    avatarUrl: profile.avatarUrl ?? undefined,
     isSuperAdmin: profile.isSuperAdmin,
     roles: profile.roles,
     perms: profile.permissions,

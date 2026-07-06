@@ -70,6 +70,9 @@ export const enum ApiCodeEnum {
   /** 请求参数错误 */
   BAD_REQUEST = 1013,
 
+  /** 系统数据不可修改 */
+  SYSTEM_DATA_CODE_IMMUTABLE = 1014,
+
   // ===== 权限相关 2xxx =====
   /** 权限不足 */
   PERMISSION_DENIED = 2001,
@@ -99,9 +102,6 @@ export const enum ApiCodeEnum {
   /** 会话已撤销 */
   SESSION_REVOKED = 3002,
 
-  /** Token 已加入黑名单 */
-  TOKEN_BLACKLISTED = 3003,
-
   /** 检测到刷新令牌复用 */
   REFRESH_TOKEN_REUSE_DETECTED = 3004,
 
@@ -120,4 +120,62 @@ export const enum ApiCodeEnum {
 
   /** RSA 解密失败 */
   RSA_DECRYPT_FAILED = 4003,
+
+  // ===== 文件相关 5xxx =====
+  /** 文件不存在 */
+  FILE_NOT_FOUND = 5001,
+
+  /** 文件过大 */
+  FILE_TOO_LARGE = 5002,
+
+  // ===== 通知相关 6xxx =====
+  /** 通知不存在 */
+  NOTICE_NOT_FOUND = 6001,
+
+  /** 通知已发布 */
+  NOTICE_ALREADY_PUBLISHED = 6002,
+
+  /** 通知未发布 */
+  NOTICE_NOT_PUBLISHED = 6003,
+
+  // ===== 系统配置相关 7xxx =====
+  /** 配置不存在 */
+  CONFIG_NOT_FOUND = 7001,
+
+  /** 配置键已存在 */
+  DUPLICATE_CONFIG_KEY = 7002,
+
+  /** 系统配置不可修改 */
+  SYSTEM_CONFIG_CANNOT_MODIFY = 7003,
+
+  // ===== OAuth 相关 8xxx =====
+  /** OAuth 提供商未启用 */
+  OAUTH_PROVIDER_DISABLED = 8001,
+
+  /** OAuth 提供商不存在 */
+  OAUTH_PROVIDER_NOT_FOUND = 8002,
+
+  /** OAuth state 无效 */
+  OAUTH_STATE_INVALID = 8003,
+
+  /** OAuth code 交换失败 */
+  OAUTH_CODE_EXCHANGE_FAILED = 8004,
+
+  /** OAuth 用户信息获取失败 */
+  OAUTH_USER_INFO_FAILED = 8005,
+
+  /** OAuth 交换码无效或已过期 */
+  OAUTH_EXCHANGE_CODE_INVALID = 8006,
+
+  /** 第三方账号已被绑定 */
+  OAUTH_IDENTITY_ALREADY_BOUND = 8007,
+
+  /** 已绑定该登录方式 */
+  OAUTH_PROVIDER_ALREADY_LINKED = 8008,
+
+  /** 无法解绑最后一个登录方式 */
+  OAUTH_CANNOT_UNBIND_LAST_IDENTITY = 8009,
+
+  /** OAuth 待处理码无效或已过期 */
+  OAUTH_PENDING_INVALID = 8010,
 }

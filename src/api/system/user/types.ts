@@ -169,6 +169,7 @@ export interface UserProfileDetail {
   nickname?: string | null;
   realName?: string | null;
   avatarFileId?: string | null;
+  avatarUrl?: string | null;
   email?: string | null;
   mobile?: string | null;
   phone?: string | null;

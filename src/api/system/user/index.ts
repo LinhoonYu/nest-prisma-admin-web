@@ -164,6 +164,7 @@ const UserAPI = {
       nickname: profile.nickname,
       realName: profile.realName,
       avatarFileId: profile.avatarFileId,
+      avatarUrl: profile.avatarUrl,
       email: profile.email,
       mobile: profile.phone,
       phone: profile.phone,

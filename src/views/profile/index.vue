@@ -6,6 +6,7 @@
           <UserAvatar
             :name="displayName"
             :avatar-file-id="userProfile.avatarFileId"
+            :avatar-url="userProfile.avatarUrl"
             :size="72"
           />
           <el-button
@@ -149,6 +150,54 @@
           </div>
         </section>
 
+        <section class="profile-card">
+          <header class="profile-card__header">
+            <div>
+              <h3 class="profile-card__title">第三方账号</h3>
+              <p class="profile-card__desc">绑定后可使用第三方账号快速登录</p>
+            </div>
+          </header>
+
+          <div class="profile-security">
+            <div v-for="item in oauthProviderList" :key="item.code" class="profile-security__item">
+              <span class="profile-icon profile-icon--large">
+                <span :class="item.icon" class="profile-oauth__icon" />
+              </span>
+              <div class="profile-security__body">
+                <div class="profile-security__title">
+                  <span>{{ item.label }}</span>
+                  <el-tag size="small" :type="item.bound ? 'success' : 'info'" effect="plain">
+                    {{ item.bound ? "已绑定" : "未绑定" }}
+                  </el-tag>
+                </div>
+                <p class="profile-security__desc">
+                  {{ item.bound ? (item.identity?.providerUsername || "已绑定") : "点击绑定后可使用此账号登录" }}
+                </p>
+              </div>
+              <div class="profile-security__actions">
+                <el-button
+                  v-if="item.bound"
+                  type="danger"
+                  link
+                  :loading="oauthUnbindLoading === item.identity!.id"
+                  @click="handleUnbindIdentity(item.identity!.id)"
+                >
+                  解绑
+                </el-button>
+                <el-button
+                  v-else
+                  type="primary"
+                  link
+                  :loading="oauthBindLoading === item.code"
+                  @click="handleBindProvider(item.code)"
+                >
+                  绑定
+                </el-button>
+              </div>
+            </div>
+          </div>
+        </section>
+
         <div class="profile-page__grid">
           <section class="profile-card">
             <header class="profile-card__header">
@@ -231,6 +280,8 @@ import type {
   PasswordChangeForm,
   UserProfileForm as UserProfileFormType,
 } from "@/api/system/user";
+import AuthAPI from "@/api/auth";
+import type { OAuthIdentity, OAuthProvider } from "@/api/auth";
 
 import type { Component } from "vue";
 import { computed, onBeforeUnmount, onMounted, reactive, ref } from "vue";
@@ -286,6 +337,22 @@ interface SecurityItem {
 const userStore = useUserStoreHook();
 
 const userProfile = ref<UserProfileDetail>({});
+const oauthIdentities = ref<OAuthIdentity[]>([]);
+const oauthBindLoading = ref<OAuthProvider | null>(null);
+const oauthUnbindLoading = ref<string | null>(null);
+
+const OAUTH_PROVIDERS: { code: OAuthProvider; label: string; icon: string }[] = [
+  { code: "google", label: "Google", icon: "i-svg:google" },
+  { code: "github", label: "GitHub", icon: "i-svg:github" },
+  { code: "gitee", label: "Gitee", icon: "i-svg:gitee" },
+];
+
+const oauthProviderList = computed(() =>
+  OAUTH_PROVIDERS.map((p) => {
+    const identity = oauthIdentities.value.find((i) => i.providerCode === p.code);
+    return { ...p, identity, bound: !!identity };
+  })
+);
 
 const enum DialogType {
   ACCOUNT = "account",
@@ -697,8 +764,45 @@ const loadUserProfile = async () => {
   userStore.userInfo.nickname = data.nickname;
 };
 
+async function loadOAuthIdentities() {
+  try {
+    oauthIdentities.value = await AuthAPI.getOAuthIdentities();
+  } catch {
+    // 拦截器已处理
+  }
+}
+
+async function handleBindProvider(provider: OAuthProvider) {
+  oauthBindLoading.value = provider;
+  try {
+    const { url } = await AuthAPI.getOAuthAuthUrl(provider, "bind");
+    window.location.href = url;
+  } catch {
+    oauthBindLoading.value = null;
+  }
+}
+
+async function handleUnbindIdentity(identityId: string) {
+  try {
+    await ElMessageBox.confirm("确定要解绑该第三方账号吗？", "解绑确认", {
+      type: "warning",
+      confirmButtonText: "确定",
+      cancelButtonText: "取消",
+    });
+    oauthUnbindLoading.value = identityId;
+    await AuthAPI.unbindOAuthIdentity(identityId);
+    ElMessage.success("解绑成功");
+    await loadOAuthIdentities();
+  } catch {
+    // cancel or error
+  } finally {
+    oauthUnbindLoading.value = null;
+  }
+}
+
 onMounted(async () => {
   await loadUserProfile();
+  await loadOAuthIdentities();
 });
 </script>
 
@@ -1048,6 +1152,12 @@ onMounted(async () => {
 .profile-status__desc {
   font-size: 12px;
   color: var(--el-text-color-secondary);
+}
+
+.profile-oauth__icon {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
 }
 
 .is-muted {

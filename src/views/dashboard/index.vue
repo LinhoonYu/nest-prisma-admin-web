@@ -7,6 +7,7 @@
             <UserAvatar
               :name="userStore.userInfo.nickname || userStore.userInfo.username"
               :avatar-file-id="userStore.userInfo.avatarFileId"
+              :avatar-url="userStore.userInfo.avatarUrl"
               :size="44"
             />
           </div>

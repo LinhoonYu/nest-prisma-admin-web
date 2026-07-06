@@ -5,10 +5,10 @@
       width: `${size}px`,
       height: `${size}px`,
       fontSize: `${Math.round(size * 0.42)}px`,
-      backgroundColor: avatarUrl ? 'transparent' : bgColor,
+      backgroundColor: resolvedUrl ? 'transparent' : bgColor,
     }"
   >
-    <img v-if="avatarUrl" :src="avatarUrl" alt="" />
+    <img v-if="resolvedUrl" :src="resolvedUrl" alt="" />
     <span v-else class="user-avatar__text">{{ initial }}</span>
   </div>
 </template>
@@ -22,13 +22,19 @@ const props = withDefaults(
     name?: string | null;
     /** 头像文件 ID */
     avatarFileId?: string | null;
+    /** 外部头像 URL（OAuth 等，avatarFileId 为空时使用） */
+    avatarUrl?: string | null;
     /** 头像尺寸（px） */
     size?: number;
   }>(),
-  { size: 36, name: "", avatarFileId: null },
+  { size: 36, name: "", avatarFileId: null, avatarUrl: null },
 );
 
-const avatarUrl = computed(() => fileProxyUrl(props.avatarFileId));
+const resolvedUrl = computed(() => {
+  if (props.avatarFileId) return fileProxyUrl(props.avatarFileId);
+  if (props.avatarUrl) return props.avatarUrl;
+  return "";
+});
 
 const initial = computed(() => {
   const n = props.name?.trim();

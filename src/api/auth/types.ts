@@ -80,6 +80,8 @@ export interface UserProfile {
   realName: string | null;
   /** 头像文件 ID */
   avatarFileId: string | null;
+  /** OAuth 头像 URL（avatarFileId 为空时使用） */
+  avatarUrl: string | null;
   /** 邮箱 */
   email: string | null;
   /** 手机号 */
@@ -115,4 +117,46 @@ export interface OAuthAuthUrlResponse {
 export interface OAuthExchangeRequest {
   /** 一次性交换码 */
   code: string;
+}
+
+/** 绑定第三方账号请求参数 */
+export interface BindIdentityRequest {
+  /** 提供商编码 */
+  provider: OAuthProvider;
+  /** 回调授权码 */
+  code: string;
+  /** state 值（PKCE 提供商必传） */
+  state?: string;
+}
+
+/** 已绑定的第三方账号信息 */
+export interface OAuthIdentity {
+  /** 绑定记录 ID */
+  id: string;
+  /** 提供商编码 */
+  providerCode: string;
+  /** 第三方用户名 */
+  providerUsername: string | null;
+  /** 第三方头像 */
+  providerAvatar: string | null;
+  /** 绑定时间 */
+  linkedAt: string;
+  /** 最后登录时间 */
+  lastLoginAt: string | null;
+}
+
+/** 首次 OAuth 登录：创建新账号请求 */
+export interface OAuthRegisterRequest {
+  /** 待处理码 */
+  pendingCode: string;
+}
+
+/** 首次 OAuth 登录：关联已有账号请求 */
+export interface LinkExistingRequest {
+  /** 待处理码 */
+  pendingCode: string;
+  /** 用户名 */
+  username: string;
+  /** 密码（RSA 关闭时为明文，开启时为加密密文） */
+  password: string;
 }
