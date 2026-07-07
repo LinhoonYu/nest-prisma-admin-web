@@ -4,7 +4,14 @@ import { ApiCodeEnum } from "@/enums/api";
 import { useUserStoreHook } from "@/stores/user";
 import { usePermissionStoreHook } from "@/stores/permission";
 import { AuthStorage, redirectToLogin } from "@/utils/auth";
+import { STORAGE_KEYS } from "@/constants";
 import type { ApiResponse } from "@/api/common";
+
+// 延迟获取 i18n 的 t 函数，避免模块加载阶段的循环依赖
+async function tt(key: string): Promise<string> {
+  const { default: i18n } = await import("@/lang");
+  return i18n.global.t(key);
+}
 
 // 记录已重试的请求，防止无限循环
 const retriedConfigs = new WeakSet<InternalAxiosRequestConfig>();
@@ -27,6 +34,9 @@ http.interceptors.request.use(
     } else if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+
+    config.headers["Accept-Language"] =
+      localStorage.getItem(STORAGE_KEYS.LANGUAGE) || "zh-cn";
 
     return config;
   },
@@ -68,7 +78,7 @@ async function handleBusinessError(
   // 需要刷新 token 的错误码
   if (TOKEN_EXPIRED_CODES.has(code)) {
     if (!config || retriedConfigs.has(config)) {
-      await redirectToLogin("登录已过期，请重新登录");
+      await redirectToLogin(await tt("request.tokenExpired"));
       throw new Error("Token Invalid");
     }
 
@@ -85,14 +95,14 @@ async function handleBusinessError(
 
       return http(config);
     } catch {
-      await redirectToLogin("登录已过期，请重新登录");
+      await redirectToLogin(await tt("request.tokenExpired"));
       throw new Error("Token refresh failed");
     }
   }
 
   // 无法续期，直接跳登录
   if (FORCE_LOGIN_CODES.has(code)) {
-    await redirectToLogin("登录已过期，请重新登录", false);
+    await redirectToLogin(await tt("request.tokenExpired"), false);
     throw new Error(message || "Token Invalid");
   }
 
@@ -100,13 +110,15 @@ async function handleBusinessError(
   if (PERMISSION_DENIED_CODES.has(code)) {
     const permissionStore = usePermissionStoreHook();
     await permissionStore.reloadPermissionSnapshotOnce();
-    ElMessage.error(message || "权限不足");
-    throw new Error(message || "权限不足");
+    const fallback = await tt("request.permissionDenied");
+    ElMessage.error(message || fallback);
+    throw new Error(message || fallback);
   }
 
   // 其他业务错误
-  ElMessage.error(message || "系统出错");
-  throw new Error(message || "系统出错");
+  const fallback = await tt("request.systemError");
+  ElMessage.error(message || fallback);
+  throw new Error(message || fallback);
 }
 
 // 响应拦截器
@@ -133,14 +145,14 @@ http.interceptors.response.use(
     const { config, response } = error;
 
     if (!response) {
-      ElMessage.error("网络连接失败");
+      ElMessage.error(await tt("request.networkError"));
       throw error;
     }
 
     // HTTP 非 2xx 错误，尝试从 body 读取错误信息
     const body = response.data as ApiResponse | undefined;
     const code = body?.code ?? response.status;
-    const message = body?.message ?? "请求失败";
+    const message = body?.message ?? (await tt("request.requestFailed"));
 
     // 走统一的业务错误处理
     return handleBusinessError(code, message, config);

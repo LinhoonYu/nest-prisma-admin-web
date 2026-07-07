@@ -126,5 +126,14 @@
     "configManagement": "Config Management",
     "copyConfigDescription": "Generate the current defaults fragment and copy it to clipboard",
     "resetConfigDescription": "Restore all settings to system default values"
+  },
+  "request": {
+    "tokenExpired": "Session expired, please log in again",
+    "permissionDenied": "Permission denied",
+    "systemError": "System error",
+    "networkError": "Network connection failed",
+    "requestFailed": "Request failed",
+    "reLogin": "Please log in again",
+    "tip": "Notice"
   }
 }

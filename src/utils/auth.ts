@@ -74,15 +74,22 @@ let redirectingToLogin = false;
  * 重定向到登录页面
  */
 export async function redirectToLogin(
-  message: string = "请重新登录",
+  message?: string,
   notify: boolean = true
 ): Promise<void> {
   if (redirectingToLogin) return;
   redirectingToLogin = true;
 
+  // 延迟加载 i18n，避免模块加载阶段的循环依赖
+  if (message === undefined) {
+    const { default: i18n } = await import("@/lang");
+    message = i18n.global.t("request.reLogin");
+  }
+
   if (notify) {
+    const { default: i18n } = await import("@/lang");
     ElNotification({
-      title: "提示",
+      title: i18n.global.t("request.tip"),
       message,
       type: "warning",
       duration: 3000,
