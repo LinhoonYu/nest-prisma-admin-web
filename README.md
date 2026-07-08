@@ -74,7 +74,7 @@ VITE_MOCK_DEV_SERVER=false
 
 ## 致谢
 
-本项目基于 [youlai-tech/vue3-element-admin](https://github.com/youlai-tech/vue3-element-admin) 修改适配，感谢原作者的开源贡献。
+本项目基于 [youlaitech/vue3-element-admin](https://github.com/youlaitech/vue3-element-admin) 修改适配，感谢原作者的开源贡献。
 
 ## License
 
