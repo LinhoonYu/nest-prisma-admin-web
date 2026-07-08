@@ -57,6 +57,11 @@ const NoticeAPI = {
     return request({ url: `${NOTICE_BASE_URL}/${id}/revoke`, method: "put" });
   },
 
+  /** 重试发送失败的通知 */
+  retry(id: string) {
+    return request({ url: `${NOTICE_BASE_URL}/${id}/retry`, method: "put" });
+  },
+
   /** 我的通知分页列表 */
   getMyNoticePage(queryParams?: MyNoticeQueryParams) {
     return request<unknown, PageResult<MyNoticeItem>>({

@@ -1,4 +1,4 @@
-﻿﻿<template>
+﻿﻿﻿﻿<template>
   <div class="page-container">
     <el-card class="page-search" shadow="never">
       <el-form ref="queryFormRef" :model="tableData.params" :inline="true" label-suffix=":">
@@ -20,7 +20,22 @@
           >
             <el-option :value="0" label="草稿" />
             <el-option :value="1" label="已发布" />
+            <el-option :value="2" label="定时发布中" />
             <el-option :value="-1" label="已撤回" />
+          </el-select>
+        </el-form-item>
+
+        <el-form-item label="发送状态" prop="sendStatus">
+          <el-select
+            v-model="tableData.params.sendStatus"
+            clearable
+            placeholder="全部"
+            style="width: 110px"
+          >
+            <el-option :value="0" label="待发送" />
+            <el-option :value="2" label="已完成" />
+            <el-option :value="-1" label="失败" />
+            <el-option :value="-2" label="已过期" />
           </el-select>
         </el-form-item>
 
@@ -98,7 +113,22 @@
           <template #default="scope">
             <el-tag v-if="scope.row.publishStatus === 0" type="info">草稿</el-tag>
             <el-tag v-else-if="scope.row.publishStatus === 1" type="success">已发布</el-tag>
+            <el-tag v-else-if="scope.row.publishStatus === 2" type="primary">定时发布中</el-tag>
             <el-tag v-else-if="scope.row.publishStatus === -1" type="warning">已撤回</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column align="center" label="发送模式" width="100">
+          <template #default="scope">
+            <el-tag v-if="scope.row.sendMode === 2" type="primary">定时</el-tag>
+            <span v-else>即时</span>
+          </template>
+        </el-table-column>
+        <el-table-column align="center" label="发送状态" width="100">
+          <template #default="scope">
+            <el-tag v-if="scope.row.sendStatus === 0" type="info">待发送</el-tag>
+            <el-tag v-else-if="scope.row.sendStatus === 2" type="success">已完成</el-tag>
+            <el-tag v-else-if="scope.row.sendStatus === -1" type="danger">失败</el-tag>
+            <el-tag v-else-if="scope.row.sendStatus === -2" type="warning">已过期</el-tag>
           </template>
         </el-table-column>
         <el-table-column label="时间" width="250">
@@ -106,6 +136,10 @@
             <div class="flex-x-start">
               <span>创建：</span>
               <span>{{ scope.row.createdAt || "-" }}</span>
+            </div>
+            <div v-if="scope.row.sendMode === 2 && scope.row.sendTime" class="flex-x-start">
+              <span>定时：</span>
+              <span>{{ scope.row.sendTime }}</span>
             </div>
             <div v-if="scope.row.publishStatus === 1" class="flex-x-start">
               <span>发布：</span>
@@ -117,7 +151,7 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column align="center" fixed="right" label="操作" width="200">
+        <el-table-column align="center" fixed="right" label="操作" width="240">
           <template #default="scope">
             <el-button type="primary" size="small" link @click="openDetailDialog(scope.row.id)">
               查看
@@ -133,7 +167,7 @@
               发布
             </el-button>
             <el-button
-              v-if="scope.row.publishStatus === 1"
+              v-if="scope.row.publishStatus === 1 || scope.row.publishStatus === 2"
               v-hasPerm="['sys:notice:revoke']"
               type="warning"
               size="small"
@@ -143,7 +177,17 @@
               撤回
             </el-button>
             <el-button
-              v-if="scope.row.publishStatus !== 1"
+              v-if="scope.row.sendStatus === -1"
+              v-hasPerm="['sys:notice:retry']"
+              type="danger"
+              size="small"
+              link
+              @click="handleRetry(scope.row.id)"
+            >
+              重试
+            </el-button>
+            <el-button
+              v-if="scope.row.publishStatus === 0"
               v-hasPerm="['sys:notice:update']"
               type="primary"
               size="small"
@@ -153,7 +197,7 @@
               编辑
             </el-button>
             <el-button
-              v-if="scope.row.publishStatus !== 1"
+              v-if="scope.row.publishStatus === 0 || scope.row.publishStatus === -1"
               v-hasPerm="['sys:notice:delete']"
               type="danger"
               size="small"
@@ -230,6 +274,31 @@
             />
           </el-select>
         </el-form-item>
+        <el-form-item label="发送模式" prop="sendMode">
+          <el-radio-group v-model="formData.sendMode">
+            <el-radio :value="1">即时</el-radio>
+            <el-radio :value="2">定时</el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item v-if="formData.sendMode === 2" label="发送时间" prop="sendTime">
+          <el-date-picker
+            v-model="formData.sendTime"
+            type="datetime"
+            placeholder="选择发送时间"
+            format="YYYY-MM-DD HH:mm"
+            value-format="YYYY-MM-DDTHH:mm:ss"
+            style="width: 100%"
+          />
+        </el-form-item>
+        <el-form-item label="有效天数" prop="expireDays">
+          <el-input-number
+            v-model="formData.expireDays"
+            :min="1"
+            :max="365"
+            placeholder="留空表示不过期"
+            controls-position="right"
+          />
+        </el-form-item>
         <el-form-item label="通知内容" prop="content">
           <WangEditor v-model="formData.content" height="350px" />
         </el-form-item>
@@ -269,10 +338,26 @@
         <el-descriptions-item label="发布状态：">
           <el-tag v-if="currentNotice?.publishStatus === 0" type="info">草稿</el-tag>
           <el-tag v-else-if="currentNotice?.publishStatus === 1" type="success">已发布</el-tag>
+          <el-tag v-else-if="currentNotice?.publishStatus === 2" type="primary">定时发布中</el-tag>
           <el-tag v-else-if="currentNotice?.publishStatus === -1" type="warning">已撤回</el-tag>
         </el-descriptions-item>
-        <el-descriptions-item label="发布时间：">
-          {{ currentNotice?.publishTime || "-" }}
+        <el-descriptions-item label="发送模式：">
+          {{ currentNotice?.sendMode === 2 ? "定时" : "即时" }}
+        </el-descriptions-item>
+        <el-descriptions-item v-if="currentNotice?.sendMode === 2" label="定时发送：">
+          {{ currentNotice?.sendTime || "-" }}
+        </el-descriptions-item>
+        <el-descriptions-item label="发送状态：">
+          <el-tag v-if="currentNotice?.sendStatus === 0" type="info">待发送</el-tag>
+          <el-tag v-else-if="currentNotice?.sendStatus === 2" type="success">已完成</el-tag>
+          <el-tag v-else-if="currentNotice?.sendStatus === -1" type="danger">失败</el-tag>
+          <el-tag v-else-if="currentNotice?.sendStatus === -2" type="warning">已过期</el-tag>
+        </el-descriptions-item>
+        <el-descriptions-item v-if="currentNotice?.expireDays" label="有效天数：">
+          {{ currentNotice.expireDays }} 天
+        </el-descriptions-item>
+        <el-descriptions-item v-if="currentNotice?.publishTime" label="发布时间：">
+          {{ currentNotice.publishTime }}
         </el-descriptions-item>
         <el-descriptions-item label="内容：">
           <div class="notice-content" v-html="currentNotice?.content" />
@@ -322,6 +407,7 @@ const tableData = reactive<{
     pageSize: 10,
     title: "",
     publishStatus: undefined,
+    sendStatus: undefined,
   },
 });
 
@@ -339,6 +425,9 @@ function defaultForm(): NoticeForm {
     level: "L",
     targetType: 1,
     targetUserIds: [],
+    sendMode: 1,
+    sendTime: undefined,
+    expireDays: undefined,
   };
 }
 
@@ -366,6 +455,18 @@ const rules: FormRules = {
       validator: (_rule, value: number[] | undefined, callback) => {
         if (formData.targetType === 2 && (value ?? []).length === 0) {
           callback(new Error("请选择指定用户"));
+        } else {
+          callback();
+        }
+      },
+      trigger: "change",
+    },
+  ],
+  sendTime: [
+    {
+      validator: (_rule, value: string | undefined, callback) => {
+        if (formData.sendMode === 2 && !value) {
+          callback(new Error("定时发送必须选择发送时间"));
         } else {
           callback();
         }
@@ -429,6 +530,9 @@ function openDialog(id?: string): void {
         level: data.level,
         targetType: data.targetType,
         targetUserIds: Array.isArray(data.targetUserIds) ? data.targetUserIds : [],
+        sendMode: data.sendMode ?? 1,
+        sendTime: data.sendTime,
+        expireDays: data.expireDays,
       });
     });
   } else {
@@ -453,6 +557,13 @@ function handleRevoke(id: string): void {
   });
 }
 
+function handleRetry(id: string): void {
+  NoticeAPI.retry(id).then(() => {
+    ElMessage.success("已重新发送");
+    fetchData();
+  });
+}
+
 function handleSubmit(): void {
   dataFormRef.value?.validate((valid) => {
     if (!valid) return;
@@ -466,6 +577,9 @@ function handleSubmit(): void {
       targetType: formData.targetType,
       targetUserIds:
         formData.targetType === 2 ? (formData.targetUserIds ?? []) : undefined,
+      sendMode: formData.sendMode,
+      sendTime: formData.sendMode === 2 ? formData.sendTime : undefined,
+      expireDays: formData.expireDays || undefined,
     };
 
     const req = formData.id
