@@ -16,6 +16,8 @@ export interface UserInfo {
   realName?: string | null;
   /** 头像文件 ID */
   avatarFileId?: string | null;
+  /** 头像 URL */
+  avatarUrl?: string | null;
   /** 邮箱 */
   email?: string | null;
   /** 手机号 */

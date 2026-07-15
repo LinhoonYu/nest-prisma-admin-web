@@ -252,7 +252,7 @@ async function handleLoginSubmit() {
 
     // RSA 启用时加密密码，密文直接放入 password 字段
     if (rsaPublicKey.value && formData.password) {
-      formData.password = await rsaEncrypt(rsaPublicKey.value, formData.password);
+      formData.password = rsaEncrypt(rsaPublicKey.value, formData.password);
     }
 
     await userStore.login(formData).then(

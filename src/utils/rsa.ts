@@ -1,53 +1,23 @@
 /**
- * RSA 加密工具（基于 Web Crypto API）
+ * RSA 加密工具（基于 node-forge）
  *
  * 后端使用 RSA-OAEP + SHA-256，公钥为 PEM 格式（SPKI 编码）。
- * 前端使用 crypto.subtle 对应的 RSA-OAEP + SHA-256 进行加密。
+ * node-forge 为纯 JS 实现，不依赖 crypto.subtle，HTTP / HTTPS 环境下均可使用。
  */
-
-/**
- * 将 PEM 格式的公钥转换为 ArrayBuffer（DER 编码）
- */
-function pemToArrayBuffer(pem: string): ArrayBuffer {
-  const base64 = pem
-    .replace(/-----BEGIN PUBLIC KEY-----/, "")
-    .replace(/-----END PUBLIC KEY-----/, "")
-    .replace(/\s/g, "");
-
-  const binaryString = atob(base64);
-  const bytes = new Uint8Array(binaryString.length);
-  for (let i = 0; i < binaryString.length; i++) {
-    bytes[i] = binaryString.charCodeAt(i);
-  }
-  return bytes.buffer;
-}
+import forge from "node-forge";
 
 /**
  * 使用 RSA-OAEP/SHA-256 加密文本，返回 Base64 编码的密文
  */
-export async function rsaEncrypt(publicKeyPem: string, plaintext: string): Promise<string> {
-  const keyData = pemToArrayBuffer(publicKeyPem);
-
-  const cryptoKey = await crypto.subtle.importKey(
-    "spki",
-    keyData,
-    { name: "RSA-OAEP", hash: "SHA-256" } as RsaOaepParams,
-    false,
-    ["encrypt"]
+export function rsaEncrypt(publicKeyPem: string, plaintext: string): string {
+  const publicKey = forge.pki.publicKeyFromPem(publicKeyPem);
+  const encrypted = publicKey.encrypt(
+    forge.util.encodeUtf8(plaintext),
+    "RSA-OAEP",
+    {
+      md: forge.md.sha256.create(),
+      mgf1: { md: forge.md.sha256.create() },
+    },
   );
-
-  const encoded = new TextEncoder().encode(plaintext);
-  const encrypted = await crypto.subtle.encrypt(
-    { name: "RSA-OAEP", hash: "SHA-256" } as RsaOaepParams,
-    cryptoKey,
-    encoded
-  );
-
-  // ArrayBuffer → Base64
-  const bytes = new Uint8Array(encrypted);
-  let binary = "";
-  for (let i = 0; i < bytes.length; i++) {
-    binary += String.fromCharCode(bytes[i]);
-  }
-  return btoa(binary);
+  return forge.util.encode64(encrypted);
 }

@@ -240,7 +240,7 @@ async function handleLinkExisting() {
   try {
     let password = linkForm.password;
     if (rsaPublicKey.value) {
-      password = await rsaEncrypt(rsaPublicKey.value, password);
+      password = rsaEncrypt(rsaPublicKey.value, password);
     }
 
     const { accessToken, refreshToken } = await AuthAPI.linkExistingOAuth({
