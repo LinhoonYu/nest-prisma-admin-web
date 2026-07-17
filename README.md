@@ -2,6 +2,9 @@
 
 基于 Vue 3 + Vite + TypeScript + Element Plus 构建的企业级后台管理系统前端。
 
+> **在线演示**：https://npa.ylhcode.top  
+> 账号：`demo` / 密码：`123456`
+
 本项目是 [nest-prisma-admin](https://github.com/LinhoonYu/nest-prisma-admin) 的配套前端，对接其后端 API。
 
 ## 技术栈
