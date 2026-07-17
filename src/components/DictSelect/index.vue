@@ -1,8 +1,8 @@
 <template>
-  <el-select
+    <el-select
     v-if="type === 'select'"
     v-model="selectedValue"
-    :placeholder="placeholder"
+    :placeholder="placeholder || t('common.pleaseSelect')"
     :disabled="disabled"
     clearable
     :style="style"
@@ -42,8 +42,10 @@
 </template>
 
 <script setup lang="ts">
+import { useI18n } from "vue-i18n";
 import { useDictStore } from "@/stores";
 
+const { t } = useI18n();
 const dictStore = useDictStore();
 
 const props = defineProps({
@@ -62,7 +64,7 @@ const props = defineProps({
   },
   placeholder: {
     type: String,
-    default: "请选择",
+    default: "",
   },
   disabled: {
     type: Boolean,

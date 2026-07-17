@@ -1,4 +1,4 @@
-﻿﻿<template>
+﻿﻿﻿﻿<template>
   <div ref="tableSelectRef" :style="'width:' + width">
     <el-popover
       :visible="popoverVisible"
@@ -89,8 +89,8 @@
             </el-form-item>
           </template>
           <el-form-item>
-            <el-button type="primary" icon="search" @click="handleQuery">搜索</el-button>
-            <el-button icon="refresh" @click="handleReset">重置</el-button>
+            <el-button type="primary" icon="search" @click="handleQuery">{{ t('common.search') }}</el-button>
+            <el-button icon="refresh" @click="handleReset">{{ t('common.reset') }}</el-button>
           </el-form-item>
         </el-form>
         <!-- 列表 -->
@@ -133,8 +133,8 @@
           <el-button type="primary" size="small" @click="handleConfirm">
             {{ confirmText }}
           </el-button>
-          <el-button size="small" @click="handleClear">清空</el-button>
-          <el-button size="small" @click="handleClose">关闭</el-button>
+          <el-button size="small" @click="handleClear">{{ t('common.clear') }}</el-button>
+          <el-button size="small" @click="handleClose">{{ t('common.close') }}</el-button>
         </div>
       </div>
     </el-popover>
@@ -143,8 +143,11 @@
 
 <script lang="ts" setup>
 import { ref, reactive, computed } from "vue";
+import { useI18n } from "vue-i18n";
 import { useResizeObserver } from "@vueuse/core";
 import type { FormInstance, PopoverProps, TableInstance } from "element-plus";
+
+const { t } = useI18n();
 
 // 对象类型
 export type IObject = Record<string, any>;
@@ -208,7 +211,7 @@ const isMultiple = props.selectConfig.multiple === true;
 // 宽度
 const width = props.selectConfig.width ?? "100%";
 // 占位符
-const placeholder = props.selectConfig.placeholder ?? "请选择";
+const placeholder = props.selectConfig.placeholder ?? t("common.pleaseSelect");
 // 是否显示弹出框
 const popoverVisible = ref(false);
 // 加载状态
@@ -282,7 +285,7 @@ for (const item of props.selectConfig.tableColumns) {
 // 选择
 const selectedItems = ref<IObject[]>([]);
 const confirmText = computed(() => {
-  return selectedItems.value.length > 0 ? `已选${selectedItems.value.length}条` : "请选择";
+  return selectedItems.value.length > 0 ? t("tableSelect.selected", { count: selectedItems.value.length }) : t("common.pleaseSelect");
 });
 function handleSelect(selection: any[]) {
   if (isMultiple || selection.length === 0) {
@@ -318,7 +321,7 @@ function handleShow() {
 // 确定
 function handleConfirm() {
   if (selectedItems.value.length === 0) {
-    ElMessage.error("请选择数据");
+    ElMessage.error(t("tableSelect.selectData"));
     return;
   }
   popoverVisible.value = false;

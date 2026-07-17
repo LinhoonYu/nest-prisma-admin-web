@@ -251,7 +251,7 @@
           :loading="copyLoading"
           @click="copyCurrentSettings"
         >
-          {{ copyLoading ? "复制中..." : t("settings.copyConfig") }}
+          {{ copyLoading ? t("settings.copying") : t("settings.copyConfig") }}
         </el-button>
         <el-button
           type="default"
@@ -259,7 +259,7 @@
           :loading="resetLoading"
           @click="resetSettingsToDefault"
         >
-          {{ resetLoading ? "重置中..." : t("settings.resetConfig") }}
+          {{ resetLoading ? t("settings.resetting") : t("settings.resetConfig") }}
         </el-button>
       </div>
     </template>
@@ -406,7 +406,7 @@ async function copyCurrentSettings(): Promise<void> {
       duration: 3000,
     });
   } catch {
-    ElMessage.error("复制配置失败");
+    ElMessage.error(t("settings.copyFailed"));
   } finally {
     copyLoading.value = false;
   }
@@ -415,8 +415,8 @@ async function copyCurrentSettings(): Promise<void> {
 async function resetSettingsToDefault(): Promise<void> {
   try {
     await ElMessageBox.confirm(t("settings.confirmReset"), t("settings.resetConfig"), {
-      confirmButtonText: "确定",
-      cancelButtonText: "取消",
+      confirmButtonText: t("common.confirm"),
+      cancelButtonText: t("common.cancel"),
       type: "warning",
     });
 

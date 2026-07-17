@@ -25,9 +25,9 @@
             <span
               v-if="onlyOneChild.meta.title"
               class="ml-1"
-              :title="translateRouteTitle(onlyOneChild.meta.title)"
+              :title="translateRouteTitle(onlyOneChild.meta.title, String(onlyOneChild.name || ''))"
             >
-              {{ translateRouteTitle(onlyOneChild.meta.title) }}
+              {{ translateRouteTitle(onlyOneChild.meta.title, String(onlyOneChild.name || '')) }}
             </span>
           </template>
         </el-menu-item>
@@ -38,8 +38,8 @@
       <template #title>
         <template v-if="item.meta">
           <LayoutMenuIcon :icon="item.meta.icon" />
-          <span v-if="item.meta.title" class="ml-1" :title="translateRouteTitle(item.meta.title)">
-            {{ translateRouteTitle(item.meta.title) }}
+          <span v-if="item.meta.title" class="ml-1" :title="translateRouteTitle(item.meta.title, String(item.name || ''))">
+            {{ translateRouteTitle(item.meta.title, String(item.name || '')) }}
           </span>
         </template>
       </template>

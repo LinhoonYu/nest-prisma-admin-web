@@ -8,10 +8,14 @@
 </template>
 
 <script setup lang="ts">
+import { useI18n } from "vue-i18n";
+
 defineOptions({
   name: "CopyButton",
   inheritAttrs: false,
 });
+
+const { t } = useI18n();
 
 const props = defineProps({
   text: {
@@ -29,10 +33,10 @@ function handleClipboard() {
     // 使用 Clipboard API
     navigator.clipboard.writeText(props.text).then(
       () => {
-        ElMessage.success("Copy successfully");
+        ElMessage.success(t("copyButton.success"));
       },
       () => {
-        ElMessage.warning("Copy failed");
+        ElMessage.warning(t("copyButton.failed"));
       }
     );
   } else {
@@ -47,9 +51,9 @@ function handleClipboard() {
       const successful = document.execCommand("copy");
 
       if (successful) {
-        ElMessage.success("Copy successfully!");
+        ElMessage.success(t("copyButton.success"));
       } else {
-        ElMessage.warning("Copy failed!");
+        ElMessage.warning(t("copyButton.failed"));
       }
     } finally {
       document.body.removeChild(input);

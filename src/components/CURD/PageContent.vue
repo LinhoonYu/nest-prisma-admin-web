@@ -200,7 +200,7 @@
     <el-dialog
       v-model="exportsModalVisible"
       :align-center="true"
-      title="导出数据"
+      :title="t('common.exportData')"
       width="600px"
       style="padding-right: 0"
       @close="handleCloseExportsModal"
@@ -214,28 +214,28 @@
           :model="exportsFormData"
           :rules="exportsFormRules"
         >
-          <el-form-item label="文件名" prop="filename">
+          <el-form-item :label="t('common.filename')" prop="filename">
             <el-input v-model="exportsFormData.filename" clearable />
           </el-form-item>
-          <el-form-item label="工作表名" prop="sheetname">
+          <el-form-item :label="t('common.sheetname')" prop="sheetname">
             <el-input v-model="exportsFormData.sheetname" clearable />
           </el-form-item>
-          <el-form-item label="数据来源" prop="origin">
+          <el-form-item :label="t('common.dataOrigin')" prop="origin">
             <el-select v-model="exportsFormData.origin">
-              <el-option label="当前数据 (当前页的数据)" :value="ExportsOriginEnum.CURRENT" />
+              <el-option :label="t('common.currentData')" :value="ExportsOriginEnum.CURRENT" />
               <el-option
-                label="选中数据 (所有选中的数据)"
+                :label="t('common.selectedData')"
                 :value="ExportsOriginEnum.SELECTED"
                 :disabled="selectionData.length <= 0"
               />
               <el-option
-                label="全量数据 (所有分页的数据)"
+                :label="t('common.allData')"
                 :value="ExportsOriginEnum.REMOTE"
                 :disabled="contentConfig.exportsAction === undefined"
               />
             </el-select>
           </el-form-item>
-          <el-form-item label="字段" prop="fields">
+          <el-form-item :label="t('common.field')" prop="fields">
             <el-checkbox-group v-model="exportsFormData.fields">
               <template v-for="col in cols" :key="col.prop">
                 <el-checkbox v-if="col.prop" :value="col.prop" :label="col.label" />
@@ -247,8 +247,8 @@
       <!-- 弹窗底部操作按钮 -->
       <template #footer>
         <div style="padding-right: var(--el-dialog-padding-primary)">
-          <el-button type="primary" @click="handleExportsSubmit">确定</el-button>
-          <el-button @click="handleCloseExportsModal">取消</el-button>
+          <el-button type="primary" @click="handleExportsSubmit">{{ t('common.confirm') }}</el-button>
+          <el-button @click="handleCloseExportsModal">{{ t('common.cancel') }}</el-button>
         </div>
       </template>
     </el-dialog>
@@ -256,7 +256,7 @@
     <el-dialog
       v-model="importModalVisible"
       :align-center="true"
-      title="导入数据"
+      :title="t('common.importData')"
       width="600px"
       style="padding-right: 0"
       @close="handleCloseImportModal"
@@ -270,7 +270,7 @@
           :model="importFormData"
           :rules="importFormRules"
         >
-          <el-form-item label="文件" prop="files">
+          <el-form-item :label="t('common.file')" prop="files">
             <el-upload
               ref="uploadRef"
               v-model:file-list="importFormData.files"
@@ -283,8 +283,8 @@
             >
               <el-icon class="el-icon--upload"><upload-filled /></el-icon>
               <div class="el-upload__text">
-                <span>将文件拖到此处，或点击上传</span>
-                <em>点击上传</em>
+                <span>{{ t('common.dragFileHere') }}</span>
+                <em>{{ t('common.clickUpload') }}</em>
               </div>
               <template #tip>
                 <div class="el-upload__tip">
@@ -296,7 +296,7 @@
                     underline="never"
                     @click="handleDownloadTemplate"
                   >
-                    下载模板
+                    {{ t('common.downloadTemplate') }}
                   </el-link>
                 </div>
               </template>
@@ -312,9 +312,9 @@
             :disabled="importFormData.files.length === 0"
             @click="handleImportSubmit"
           >
-            确定
+            {{ t('common.confirm') }}
           </el-button>
-          <el-button @click="handleCloseImportModal">取消</el-button>
+          <el-button @click="handleCloseImportModal">{{ t('common.cancel') }}</el-button>
         </div>
       </template>
     </el-dialog>
@@ -322,6 +322,7 @@
 </template>
 
 <script setup lang="ts">
+import { useI18n } from "vue-i18n";
 import { hasPerm } from "@/utils/auth";
 import { useDateFormat, useThrottleFn } from "@vueuse/core";
 import {
@@ -338,6 +339,8 @@ import { reactive, ref, computed } from "vue";
 import type { IContentConfig, IObject, IOperateData } from "./types";
 import type { IToolsButton } from "./types";
 
+const { t } = useI18n();
+
 // 定义接收的属性
 const props = defineProps<{ contentConfig: IContentConfig }>();
 // 定义自定义事件
@@ -353,19 +356,19 @@ const emit = defineEmits<{
 
 // 表格工具栏按钮配置
 const config = computed(() => props.contentConfig);
-const buttonConfig = reactive<Record<string, IObject>>({
-  add: { text: "新增", attrs: { icon: "plus", type: "success" }, perm: "create" },
-  delete: { text: "删除", attrs: { icon: "delete", type: "danger" }, perm: "delete" },
-  import: { text: "导入", attrs: { icon: "upload", type: "" }, perm: "import" },
-  export: { text: "导出", attrs: { icon: "download", type: "" }, perm: "export" },
-  refresh: { text: "刷新", attrs: { icon: "refresh", type: "" }, perm: "*:*:*" },
-  filter: { text: "筛选列", attrs: { icon: "operation", type: "" }, perm: "*:*:*" },
-  search: { text: "搜索", attrs: { icon: "search", type: "" }, perm: "list" },
-  imports: { text: "批量导入", attrs: { icon: "upload", type: "" }, perm: "imports" },
-  exports: { text: "批量导出", attrs: { icon: "download", type: "" }, perm: "exports" },
-  view: { text: "查看", attrs: { icon: "view", type: "primary" }, perm: "view" },
-  edit: { text: "编辑", attrs: { icon: "edit", type: "primary" }, perm: "update" },
-});
+const buttonConfig = computed<Record<string, IObject>>(() => ({
+  add: { text: t("common.add"), attrs: { icon: "plus", type: "success" }, perm: "create" },
+  delete: { text: t("common.delete"), attrs: { icon: "delete", type: "danger" }, perm: "delete" },
+  import: { text: t("common.import"), attrs: { icon: "upload", type: "" }, perm: "import" },
+  export: { text: t("common.export"), attrs: { icon: "download", type: "" }, perm: "export" },
+  refresh: { text: t("common.refresh"), attrs: { icon: "refresh", type: "" }, perm: "*:*:*" },
+  filter: { text: t("common.filterColumn"), attrs: { icon: "operation", type: "" }, perm: "*:*:*" },
+  search: { text: t("common.search"), attrs: { icon: "search", type: "" }, perm: "list" },
+  imports: { text: t("common.batchImport"), attrs: { icon: "upload", type: "" }, perm: "imports" },
+  exports: { text: t("common.batchExport"), attrs: { icon: "download", type: "" }, perm: "exports" },
+  view: { text: t("common.view"), attrs: { icon: "view", type: "primary" }, perm: "view" },
+  edit: { text: t("common.edit"), attrs: { icon: "edit", type: "primary" }, perm: "update" },
+}));
 
 // 主键
 const pk = props.contentConfig.pk ?? "id";
@@ -396,14 +399,14 @@ function createToolbar(toolbar: Array<string | IToolsButton>, attr = {}) {
     const isString = typeof item === "string";
     return {
       name: isString ? item : item?.name || "",
-      text: isString ? buttonConfig[item].text : item?.text,
+      text: isString ? buttonConfig.value[item].text : item?.text,
       attrs: {
         ...attr,
-        ...(isString ? buttonConfig[item].attrs : item?.attrs),
+        ...(isString ? buttonConfig.value[item].attrs : item?.attrs),
       },
       render: isString ? undefined : (item?.render ?? undefined),
       perm: isString
-        ? getButtonPerm(buttonConfig[item].perm)
+        ? getButtonPerm(buttonConfig.value[item].perm)
         : item?.perm
           ? getButtonPerm(item.perm as string)
           : "*:*:*",
@@ -501,20 +504,20 @@ function handleRefresh(isRestart = false) {
 function handleDelete(id?: number | string) {
   const ids = [id || removeIds.value].join(",");
   if (!ids) {
-    ElMessage.warning("请勾选删除项");
+    ElMessage.warning(t("common.selectDeleteItem"));
     return;
   }
 
-  ElMessageBox.confirm("确认删除?", "警告", {
-    confirmButtonText: "确定",
-    cancelButtonText: "取消",
+  ElMessageBox.confirm(t("common.confirmDelete"), t("common.warning"), {
+    confirmButtonText: t("common.confirm"),
+    cancelButtonText: t("common.cancel"),
     type: "warning",
   }).then(
     function () {
       if (props.contentConfig.deleteAction) {
         props.contentConfig.deleteAction(ids).then(
           () => {
-            ElMessage.success("删除成功");
+            ElMessage.success(t("common.deleteSuccess"));
             removeIds.value = [];
             // 清空选中项
             tableRef.value?.clearSelection();
@@ -525,7 +528,7 @@ function handleDelete(id?: number | string) {
           }
         );
       } else {
-        ElMessage.error("未配置deleteAction");
+        ElMessage.error(t("common.deleteAction") + " not configured");
       }
     },
     () => {
@@ -555,8 +558,8 @@ const exportsFormData = reactive({
   origin: ExportsOriginEnum.CURRENT,
 });
 const exportsFormRules: FormRules = {
-  fields: [{ required: true, message: "请选择字段" }],
-  origin: [{ required: true, message: "请选择数据来源" }],
+  fields: [{ required: true, message: t("common.selectField") }],
+  origin: [{ required: true, message: t("common.selectDataOrigin") }],
 };
 // 打开导出弹窗
 function handleOpenExportsModal() {
@@ -606,7 +609,7 @@ function handleExports() {
         );
       });
     } else {
-      ElMessage.error("未配置exportsAction");
+      ElMessage.error("exportsAction not configured");
     }
   } else {
     worksheet.addRows(
@@ -632,7 +635,7 @@ const importFormData = reactive<{
   files: [],
 });
 const importFormRules: FormRules = {
-  files: [{ required: true, message: "请选择文件" }],
+  files: [{ required: true, message: t("common.file") }],
 };
 // 打开导入弹窗
 function handleOpenImportModal(isFile: boolean = false) {
@@ -660,7 +663,7 @@ function handleDownloadTemplate() {
       saveXlsx(fileData, fileName);
     });
   } else {
-    ElMessage.error("未配置importTemplate");
+    ElMessage.error("importTemplate not configured");
   }
 }
 // 导入确认
@@ -687,11 +690,11 @@ function handleCloseImportModal() {
 function handleImport() {
   const importAction = props.contentConfig.importAction;
   if (importAction === undefined) {
-    ElMessage.error("未配置importAction");
+    ElMessage.error(t("common.importActionNotConfigured"));
     return;
   }
   importAction(importFormData.files[0].raw as File).then(() => {
-    ElMessage.success("导入数据成功");
+    ElMessage.success(t("common.importSuccess"));
     handleCloseImportModal();
     handleRefresh(true);
   });
@@ -700,7 +703,7 @@ function handleImport() {
 function handleImports() {
   const importsAction = props.contentConfig.importsAction;
   if (importsAction === undefined) {
-    ElMessage.error("未配置importsAction");
+    ElMessage.error("importsAction not configured");
     return;
   }
   // 获取选择的文件
@@ -741,11 +744,11 @@ function handleImports() {
             }
           }
           if (data.length === 0) {
-            ElMessage.error("未解析到数据");
+            ElMessage.error(t("common.noDataParsed"));
             return;
           }
           importsAction(data).then(() => {
-            ElMessage.success("导入数据成功");
+            ElMessage.success(t("common.importSuccess"));
             handleCloseImportModal();
             handleRefresh(true);
           });
@@ -753,7 +756,7 @@ function handleImports() {
         (error) => console.error(error)
       );
     } else {
-      ElMessage.error("读取文件失败");
+      ElMessage.error(t("common.readFileFailed"));
     }
   };
 }
@@ -815,7 +818,7 @@ function handleModify(field: string, value: boolean | string | number, row: Reco
       value,
     });
   } else {
-    ElMessage.error("未配置modifyAction");
+    ElMessage.error("modifyAction not configured");
   }
 }
 
@@ -901,7 +904,7 @@ function exportPageData(formData: IObject = {}) {
       saveXlsx(fileData, fileName);
     });
   } else {
-    ElMessage.error("未配置exportAction");
+    ElMessage.error("exportAction not configured");
   }
 }
 

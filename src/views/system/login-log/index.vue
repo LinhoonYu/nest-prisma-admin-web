@@ -2,47 +2,47 @@
   <div class="page-container">
     <el-card class="page-search" shadow="never">
       <el-form ref="queryFormRef" :model="tableData.params" :inline="true" label-width="auto">
-        <el-form-item prop="username" label="用户名">
+        <el-form-item prop="username" :label="t('loginLog.username')">
           <el-input
             v-model="tableData.params.username"
-            placeholder="用户名"
+            :placeholder="t('loginLog.username')"
             clearable
             @keyup.enter="handleQuery"
           />
         </el-form-item>
 
-        <el-form-item prop="ip" label="IP">
+        <el-form-item prop="ip" :label="t('loginLog.ip')">
           <el-input
             v-model="tableData.params.ip"
-            placeholder="IP地址"
+            :placeholder="t('loginLog.ipAddress')"
             clearable
             @keyup.enter="handleQuery"
           />
         </el-form-item>
 
-        <el-form-item prop="status" label="状态">
-          <el-select v-model="tableData.params.status" placeholder="全部" clearable style="width: 120px">
-            <el-option label="成功" :value="1" />
-            <el-option label="失败" :value="0" />
+        <el-form-item prop="status" :label="t('loginLog.status')">
+          <el-select v-model="tableData.params.status" :placeholder="t('common.all')" clearable style="width: 120px">
+            <el-option :label="t('loginLog.statusOptions.success')" :value="1" />
+            <el-option :label="t('loginLog.statusOptions.failure')" :value="0" />
           </el-select>
         </el-form-item>
 
-        <el-form-item prop="dateRange" label="登录时间">
+        <el-form-item prop="dateRange" :label="t('loginLog.loginTime')">
           <el-date-picker
             v-model="tableData.params.dateRange"
             :editable="false"
             type="daterange"
             range-separator="~"
-            start-placeholder="开始时间"
-            end-placeholder="截止时间"
+            :start-placeholder="t('loginLog.startTime')"
+            :end-placeholder="t('loginLog.endTime')"
             value-format="YYYY-MM-DD"
             style="width: 260px"
           />
         </el-form-item>
 
         <el-form-item>
-          <el-button type="primary" @click="handleQuery">搜索</el-button>
-          <el-button @click="handleResetQuery">重置</el-button>
+          <el-button type="primary" @click="handleQuery">{{ t('common.search') }}</el-button>
+          <el-button @click="handleResetQuery">{{ t('common.reset') }}</el-button>
         </el-form-item>
       </el-form>
     </el-card>
@@ -50,12 +50,12 @@
     <el-card ref="tableWrapperRef" class="page-content" shadow="never">
       <div class="page-toolbar">
         <div class="page-toolbar__right">
-          <el-tooltip content="刷新" placement="top">
+          <el-tooltip :content="t('common.refresh')" placement="top">
             <el-button class="page-icon-btn" @click="fetchData">
               <el-icon><Refresh /></el-icon>
             </el-button>
           </el-tooltip>
-          <el-tooltip content="全屏" placement="top">
+          <el-tooltip :content="t('common.fullscreen')" placement="top">
             <el-button class="page-icon-btn" @click="toggleFullscreen">
               <el-icon><FullScreen /></el-icon>
             </el-button>
@@ -65,34 +65,34 @@
 
       <div class="page-table-wrapper">
       <el-table v-loading="loading" class="page-table" :data="tableData.items" height="100%" highlight-current-row border>
-        <el-table-column label="用户名" prop="username" width="140" />
-        <el-table-column label="登录方式" prop="loginType" width="120" align="center">
+        <el-table-column :label="t('loginLog.username')" prop="username" width="140" />
+        <el-table-column :label="t('loginLog.loginType')" prop="loginType" width="120" align="center">
           <template #default="{ row }">
             <el-tag size="small">{{ getLoginTypeText(row.loginType) }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="状态" prop="status" width="80" align="center">
+        <el-table-column :label="t('loginLog.status')" prop="status" width="80" align="center">
           <template #default="{ row }">
             <el-tag :type="row.status === 1 ? 'success' : 'danger'" size="small">
-              {{ row.status === 1 ? "成功" : "失败" }}
+              {{ row.status === 1 ? t('loginLog.statusOptions.success') : t('loginLog.statusOptions.failure') }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="IP地址" prop="ip" width="140" />
-        <el-table-column label="登录地点" prop="location" width="140" show-overflow-tooltip />
-        <el-table-column label="浏览器" prop="browser" width="120" show-overflow-tooltip />
-        <el-table-column label="操作系统" prop="os" width="120" show-overflow-tooltip />
-        <el-table-column label="设备" prop="device" width="100" show-overflow-tooltip />
-        <el-table-column label="失败原因" prop="failureReason" min-width="160" show-overflow-tooltip>
+        <el-table-column :label="t('loginLog.ipAddress')" prop="ip" width="140" />
+        <el-table-column :label="t('loginLog.location')" prop="location" width="140" show-overflow-tooltip />
+        <el-table-column :label="t('loginLog.browser')" prop="browser" width="120" show-overflow-tooltip />
+        <el-table-column :label="t('loginLog.os')" prop="os" width="120" show-overflow-tooltip />
+        <el-table-column :label="t('loginLog.device')" prop="device" width="100" show-overflow-tooltip />
+        <el-table-column :label="t('loginLog.failureReason')" prop="failureReason" min-width="160" show-overflow-tooltip>
           <template #default="{ row }">
             <span v-if="row.failureReason" class="color-danger">{{ row.failureReason }}</span>
             <span v-else class="color-text-placeholder">—</span>
           </template>
         </el-table-column>
-        <el-table-column label="登录时间" prop="createdAt" width="180" />
-        <el-table-column label="操作" width="80" align="center" fixed="right">
+        <el-table-column :label="t('loginLog.loginTime')" prop="createdAt" width="180" />
+        <el-table-column :label="t('common.operation')" width="80" align="center" fixed="right">
           <template #default="{ row }">
-            <el-button type="primary" link size="small" @click="handleDetail(row)">详情</el-button>
+            <el-button type="primary" link size="small" @click="handleDetail(row)">{{ t('common.detail') }}</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -108,26 +108,26 @@
       />
     </el-card>
 
-    <el-dialog v-model="detailVisible" title="登录日志详情" width="640px">
+    <el-dialog v-model="detailVisible" :title="t('loginLog.detailTitle')" width="640px">
       <el-descriptions :column="2" border>
-        <el-descriptions-item label="用户名">{{ detailData.username }}</el-descriptions-item>
-        <el-descriptions-item label="登录方式">{{ getLoginTypeText(detailData.loginType) }}</el-descriptions-item>
-        <el-descriptions-item label="状态">
+        <el-descriptions-item :label="t('loginLog.username')">{{ detailData.username }}</el-descriptions-item>
+        <el-descriptions-item :label="t('loginLog.loginType')">{{ getLoginTypeText(detailData.loginType) }}</el-descriptions-item>
+        <el-descriptions-item :label="t('loginLog.status')">
           <el-tag :type="detailData.status === 1 ? 'success' : 'danger'" size="small">
-            {{ detailData.status === 1 ? "成功" : "失败" }}
+            {{ detailData.status === 1 ? t('loginLog.statusOptions.success') : t('loginLog.statusOptions.failure') }}
           </el-tag>
         </el-descriptions-item>
-        <el-descriptions-item label="登录时间">{{ detailData.createdAt }}</el-descriptions-item>
-        <el-descriptions-item label="IP地址">{{ detailData.ip }}</el-descriptions-item>
-        <el-descriptions-item label="登录地点">{{ detailData.location }}</el-descriptions-item>
-        <el-descriptions-item label="浏览器">{{ detailData.browser }}</el-descriptions-item>
-        <el-descriptions-item label="操作系统">{{ detailData.os }}</el-descriptions-item>
-        <el-descriptions-item label="设备">{{ detailData.device }}</el-descriptions-item>
-        <el-descriptions-item label="认证来源">{{ detailData.provider }}</el-descriptions-item>
-        <el-descriptions-item v-if="detailData.failureReason" label="失败原因" :span="2">
+        <el-descriptions-item :label="t('loginLog.loginTime')">{{ detailData.createdAt }}</el-descriptions-item>
+        <el-descriptions-item :label="t('loginLog.ipAddress')">{{ detailData.ip }}</el-descriptions-item>
+        <el-descriptions-item :label="t('loginLog.location')">{{ detailData.location }}</el-descriptions-item>
+        <el-descriptions-item :label="t('loginLog.browser')">{{ detailData.browser }}</el-descriptions-item>
+        <el-descriptions-item :label="t('loginLog.os')">{{ detailData.os }}</el-descriptions-item>
+        <el-descriptions-item :label="t('loginLog.device')">{{ detailData.device }}</el-descriptions-item>
+        <el-descriptions-item :label="t('loginLog.provider')">{{ detailData.provider }}</el-descriptions-item>
+        <el-descriptions-item v-if="detailData.failureReason" :label="t('loginLog.failureReason')" :span="2">
           <span class="color-danger">{{ detailData.failureReason }}</span>
         </el-descriptions-item>
-        <el-descriptions-item label="User-Agent" :span="2">
+        <el-descriptions-item :label="t('loginLog.userAgent')" :span="2">
           <span style="word-break: break-all">{{ detailData.userAgent }}</span>
         </el-descriptions-item>
       </el-descriptions>
@@ -141,19 +141,19 @@ defineOptions({
   inheritAttrs: false,
 });
 
+import { useI18n } from "vue-i18n";
 import { useFullscreen } from "@vueuse/core";
 import LoginLogAPI from "@/api/system/login-log";
 import type { LoginLogItem, LoginLogQueryParams } from "@/api/system/login-log";
 import type { PageResult } from "@/api/common";
 import type { FormInstance } from "element-plus";
 
-const LOGIN_TYPE_MAP: Record<number, string> = {
-  1: "账号密码",
-};
+const { t } = useI18n();
 
 function getLoginTypeText(loginType?: number): string {
   if (loginType === undefined) return "—";
-  return LOGIN_TYPE_MAP[loginType] ?? `类型${loginType}`;
+  if (loginType === 1) return t("loginLog.loginTypeOptions.accountPassword");
+  return `${loginType}`;
 }
 
 const tableWrapperRef = ref<HTMLElement | null>(null);

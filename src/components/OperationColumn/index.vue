@@ -1,5 +1,5 @@
 <template>
-  <el-table-column :prop :label :fixed :align :show-overflow-tooltip :width="finalWidth">
+  <el-table-column :prop :label="label || t('common.operation')" :fixed :align :show-overflow-tooltip :width="finalWidth">
     <template #default="{ row }">
       <div v-auto class="operation-button">
         <slot :row="row" />
@@ -9,6 +9,10 @@
 </template>
 
 <script lang="ts" setup>
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
+
 interface Props {
   /**
    * 表格数据长度
@@ -28,7 +32,7 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  label: "操作",
+  label: "",
   fixed: "right",
   align: "center",
 });

@@ -14,7 +14,7 @@
       multiple
     >
       <el-button type="primary" :disabled="fileList.length >= props.limit">
-        {{ props.uploadBtnText }}
+        {{ props.uploadBtnText || t('upload.uploadFile') }}
       </el-button>
 
       <template #file="{ file }">
@@ -43,6 +43,7 @@
   </div>
 </template>
 <script lang="ts" setup>
+import { useI18n } from "vue-i18n";
 import {
   UploadRawFile,
   UploadUserFile,
@@ -53,6 +54,8 @@ import {
 
 import FileAPI from "@/api/file";
 import type { FileInfo } from "@/api/file";
+
+const { t } = useI18n();
 
 interface FileItem {
   name: string;
@@ -83,7 +86,7 @@ const props = defineProps({
   },
   uploadBtnText: {
     type: String,
-    default: "上传文件",
+    default: "",
   },
   style: {
     type: Object,
@@ -114,7 +117,7 @@ watch(
 
 function handleBeforeUpload(file: UploadRawFile) {
   if (file.size > props.maxFileSize * 1024 * 1024) {
-    ElMessage.warning("上传文件不能大于" + props.maxFileSize + "M");
+    ElMessage.warning(t("upload.fileTooLarge", { size: props.maxFileSize }));
     return false;
   }
   return true;
@@ -141,7 +144,7 @@ function handleUpload(options: UploadRequestOptions) {
 }
 
 function handleExceed() {
-  ElMessage.warning("最多只能上传 " + props.limit + " 个文件");
+  ElMessage.warning(t("upload.fileLimit", { limit: props.limit }));
 }
 
 const handleSuccess = (
@@ -149,7 +152,7 @@ const handleSuccess = (
   _uploadFile: UploadFile,
   files: UploadFiles,
 ) => {
-  ElMessage.success("上传成功");
+  ElMessage.success(t("upload.success"));
   if (
     files.every((file: UploadFile) => {
       return file.status === "success" || file.status === "fail";
@@ -176,7 +179,7 @@ const handleSuccess = (
 };
 
 const handleError = (_error: unknown) => {
-  ElMessage.error("上传失败");
+  ElMessage.error(t("upload.failed"));
 };
 
 function handleRemove(file: UploadFile) {
@@ -194,7 +197,7 @@ async function handleDownload(file: UploadUserFile) {
   try {
     await FileAPI.download(item.key, item.name);
   } catch {
-    ElMessage.error("文件下载失败");
+    ElMessage.error(t("upload.downloadFailed"));
   }
 }
 

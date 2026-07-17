@@ -19,11 +19,11 @@
           <div class="login-brand__main">
             <el-tag class="login-brand__tag" type="primary" effect="plain" round>
               <span class="login-brand__tag-dot" />
-              Enterprise Ready
+              {{ t("login.brand.enterpriseReady") }}
             </el-tag>
-            <h1 class="login-brand__title">企业级管理系统</h1>
+            <h1 class="login-brand__title">{{ t("login.brand.title") }}</h1>
             <p class="login-brand__desc">
-              提供安全、高效、可扩展的管理解决方案，助力企业数字化转型与业务增长。
+              {{ t("login.brand.description") }}
             </p>
           </div>
           <div class="login-brand__features">
@@ -31,19 +31,19 @@
               <span class="login-brand__feature-mark">
                 <span class="login-brand__feature-icon i-svg:security" />
               </span>
-              <span class="login-brand__feature-text">安全可靠</span>
+              <span class="login-brand__feature-text">{{ t("login.brand.secure") }}</span>
             </div>
             <div class="login-brand__feature">
               <span class="login-brand__feature-mark">
                 <el-icon class="login-brand__feature-icon"><Clock /></el-icon>
               </span>
-              <span class="login-brand__feature-text">高效稳定</span>
+              <span class="login-brand__feature-text">{{ t("login.brand.efficient") }}</span>
             </div>
             <div class="login-brand__feature">
               <span class="login-brand__feature-mark">
                 <span class="login-brand__feature-icon i-svg:flexible" />
               </span>
-              <span class="login-brand__feature-text">灵活扩展</span>
+              <span class="login-brand__feature-text">{{ t("login.brand.flexible") }}</span>
             </div>
           </div>
         </div>
@@ -53,8 +53,8 @@
         <div class="login-card__inner">
           <transition name="fade-slide" mode="out-in">
             <div v-if="component === 'login'" key="login" class="login-card__form">
-              <h2 class="login-card__title">欢迎回来</h2>
-              <p class="login-card__desc">请完成身份验证后进入系统</p>
+              <h2 class="login-card__title">{{ t("login.welcomeBack") }}</h2>
+              <p class="login-card__desc">{{ t("login.authPrompt") }}</p>
 
               <el-form
                 ref="loginFormRef"
@@ -66,16 +66,16 @@
                 <el-form-item prop="username">
                   <el-input
                     v-model.trim="loginFormData.username"
-                    placeholder="用户名"
+                    :placeholder="t('login.username')"
                     :prefix-icon="UserIcon"
                   />
                 </el-form-item>
 
-                <el-tooltip :visible="isCapsLock" content="大写锁定已开启" placement="right">
+                <el-tooltip :visible="isCapsLock" :content="t('login.capsLockOn')" placement="right">
                   <el-form-item prop="password">
                     <el-input
                       v-model.trim="loginFormData.password"
-                      placeholder="密码"
+                      :placeholder="t('login.password')"
                       type="password"
                       show-password
                       :prefix-icon="LockIcon"
@@ -89,7 +89,7 @@
                   <div class="captcha-row">
                     <el-input
                       v-model.trim="loginFormData.captchaCode"
-                      placeholder="验证码"
+                      :placeholder="t('login.captchaCode')"
                       class="captcha-row__input"
                       @keyup.enter="handleLoginSubmit"
                     >
@@ -108,8 +108,8 @@
                 </el-form-item>
 
                 <div class="login-options">
-                  <el-checkbox v-model="loginFormData.rememberMe">记住我</el-checkbox>
-                  <a class="login-options__link" @click="showForm('resetPwd')">忘记密码？</a>
+                  <el-checkbox v-model="loginFormData.rememberMe">{{ t("login.rememberMe") }}</el-checkbox>
+                  <a class="login-options__link" @click="showForm('resetPwd')">{{ t("login.forgetPassword") }}</a>
                 </div>
 
                 <el-button
@@ -119,12 +119,12 @@
                   class="login-btn"
                   @click="handleLoginSubmit"
                 >
-                  登录
+                  {{ t("login.login") }}
                 </el-button>
               </el-form>
 
               <div class="login-alt">
-                <div class="login-alt__divider">其他登录方式</div>
+                <div class="login-alt__divider">{{ t("login.otherLoginMethods") }}</div>
                 <div class="login-alt__buttons">
                   <button
                     class="login-alt__btn"
@@ -178,6 +178,7 @@ import AuthAPI from "@/api/auth";
 import type { LoginRequest, OAuthProvider } from "@/api/auth";
 import router from "@/router";
 import { useUserStore } from "@/stores";
+import { useI18n } from "vue-i18n";
 import { AuthStorage } from "@/utils/auth";
 import { rsaEncrypt } from "@/utils/rsa";
 import { appConfig } from "@/settings";
@@ -185,6 +186,7 @@ import ThemeSwitch from "@/components/ThemeSwitch/index.vue";
 import ResetPwd from "./components/ResetPwd.vue";
 import logo from "@/assets/images/logo.png";
 
+const { t } = useI18n();
 const userStore = useUserStore();
 const route = useRoute();
 const component = ref<"login" | "resetPwd">("login");
@@ -210,12 +212,12 @@ const loginFormData = ref<LoginRequest>({
 });
 
 const loginRules = computed(() => ({
-  username: [{ required: true, trigger: "blur", message: "请输入用户名" }],
+  username: [{ required: true, trigger: "blur", message: t("login.message.username.required") }],
   password: [
-    { required: true, trigger: "blur", message: "请输入密码" },
-    { min: 6, message: "密码不能少于6位", trigger: "blur" },
+    { required: true, trigger: "blur", message: t("login.message.password.required") },
+    { min: 6, message: t("login.message.password.min"), trigger: "blur" },
   ],
-  captchaCode: [{ required: true, trigger: "blur", message: "请输入验证码" }],
+  captchaCode: [{ required: true, trigger: "blur", message: t("login.message.captchaCode.required") }],
 }));
 
 function getCaptcha() {

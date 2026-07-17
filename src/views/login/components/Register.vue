@@ -1,4 +1,4 @@
-﻿﻿<template>
+﻿﻿﻿﻿<template>
   <div>
     <h3 text-center m-0 mb-20px>{{ t("login.reg") }}</h3>
     <el-form ref="formRef" :model="model" :rules="rules" size="large">
@@ -70,7 +70,7 @@
               flex-center
               v-html="captchaSvg"
             />
-            <el-text v-else type="info" size="small">点击获取验证码</el-text>
+            <el-text v-else type="info" size="small">{{ t("login.getCaptcha") }}</el-text>
           </div>
         </div>
       </el-form-item>
@@ -200,6 +200,6 @@ function checkCapsLock(event: KeyboardEvent) {
 
 const submit = async () => {
   await formRef.value?.validate();
-  ElMessage.warning("开发中 ...");
+  ElMessage.warning(t("login.developing"));
 };
 </script>

@@ -2,21 +2,24 @@
   <div class="wh-full mx-auto flex-center flex-col lg:flex-row">
     <img class="min-w-[23.4375rem] sm:w-150" src="@/assets/images/error/404.svg" alt="404" />
     <div class="w-75">
-      <div class="oops mb-5 text-[2rem] font-bold">OOPS</div>
+      <div class="oops mb-5 text-[2rem] font-bold">{{ t("error.404.oops") }}</div>
       <div class="info text-gray mb-7 text-[0.8125rem]">
-        该页面无法访问
+        {{ t("error.404.pageInaccessible") }}
       </div>
-      <div class="headline mb-2.5 text-xl font-bold text-[#222]">抱歉，您访问的页面不存在</div>
+      <div class="headline mb-2.5 text-xl font-bold text-[#222]">{{ t("error.404.notFound") }}</div>
       <div class="info text-gray mb-7 text-[0.8125rem]">
-        请确认您输入的网址是否正确，或者点击下方按钮返回首页
+        {{ t("error.404.notFoundDesc") }}
       </div>
-      <el-button round type="primary" class="btn h-9 w-28 mb-10" @click="back">返回首页</el-button>
+      <el-button round type="primary" class="btn h-9 w-28 mb-10" @click="back">{{ t("error.404.backHome") }}</el-button>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { useI18n } from "vue-i18n";
+
 defineOptions({ name: "Page404" });
+const { t } = useI18n();
 const router = useRouter();
 const back = () => router.push("/");
 </script>

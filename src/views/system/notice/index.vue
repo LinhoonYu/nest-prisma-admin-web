@@ -1,47 +1,47 @@
-﻿﻿﻿﻿<template>
+﻿﻿﻿<template>
   <div class="page-container">
     <el-card class="page-search" shadow="never">
       <el-form ref="queryFormRef" :model="tableData.params" :inline="true" label-suffix=":">
-        <el-form-item label="标题" prop="title">
+        <el-form-item :label="t('notice.title')" prop="title">
           <el-input
             v-model="tableData.params.title"
-            placeholder="标题"
+            :placeholder="t('notice.title')"
             clearable
             @keyup.enter="handleQuery()"
           />
         </el-form-item>
 
-        <el-form-item label="发布状态" prop="publishStatus">
+        <el-form-item :label="t('notice.publishStatus')" prop="publishStatus">
           <el-select
             v-model="tableData.params.publishStatus"
             clearable
-            placeholder="全部"
+            :placeholder="t('common.all')"
             style="width: 100px"
           >
-            <el-option :value="0" label="草稿" />
-            <el-option :value="1" label="已发布" />
-            <el-option :value="2" label="定时发布中" />
-            <el-option :value="-1" label="已撤回" />
+            <el-option :value="0" :label="t('notice.publishStatusOptions.draft')" />
+            <el-option :value="1" :label="t('notice.publishStatusOptions.published')" />
+            <el-option :value="2" :label="t('notice.publishStatusOptions.scheduled')" />
+            <el-option :value="-1" :label="t('notice.publishStatusOptions.revoked')" />
           </el-select>
         </el-form-item>
 
-        <el-form-item label="发送状态" prop="sendStatus">
+        <el-form-item :label="t('notice.sendStatus')" prop="sendStatus">
           <el-select
             v-model="tableData.params.sendStatus"
             clearable
-            placeholder="全部"
+            :placeholder="t('common.all')"
             style="width: 110px"
           >
-            <el-option :value="0" label="待发送" />
-            <el-option :value="2" label="已完成" />
-            <el-option :value="-1" label="失败" />
-            <el-option :value="-2" label="已过期" />
+            <el-option :value="0" :label="t('notice.sendStatusOptions.pending')" />
+            <el-option :value="2" :label="t('notice.sendStatusOptions.completed')" />
+            <el-option :value="-1" :label="t('notice.sendStatusOptions.failed')" />
+            <el-option :value="-2" :label="t('notice.sendStatusOptions.expired')" />
           </el-select>
         </el-form-item>
 
         <el-form-item>
-          <el-button type="primary" @click="handleQuery()">搜索</el-button>
-          <el-button @click="handleResetQuery()">重置</el-button>
+          <el-button type="primary" @click="handleQuery()">{{ t('common.search') }}</el-button>
+          <el-button @click="handleResetQuery()">{{ t('common.reset') }}</el-button>
         </el-form-item>
       </el-form>
     </el-card>
@@ -54,7 +54,7 @@
             type="primary"
             @click="openDialog()"
           >
-            新增通知
+            {{ t('notice.addNotice') }}
           </el-button>
           <el-button
             v-hasPerm="['sys:notice:delete']"
@@ -62,16 +62,16 @@
             :disabled="selectIds.length === 0"
             @click="handleDelete()"
           >
-            删除
+            {{ t('common.delete') }}
           </el-button>
         </div>
         <div class="page-toolbar__right">
-          <el-tooltip content="刷新" placement="top">
+          <el-tooltip :content="t('common.refresh')" placement="top">
             <el-button class="page-icon-btn" @click="fetchData">
               <el-icon><Refresh /></el-icon>
             </el-button>
           </el-tooltip>
-          <el-tooltip content="全屏" placement="top">
+          <el-tooltip :content="t('common.fullscreen')" placement="top">
             <el-button class="page-icon-btn" @click="toggleFullscreen">
               <el-icon><FullScreen /></el-icon>
             </el-button>
@@ -91,70 +91,70 @@
         @selection-change="handleSelectionChange"
       >
         <el-table-column type="selection" width="55" align="center" />
-        <el-table-column type="index" label="序号" width="60" />
-        <el-table-column label="通知标题" prop="title" min-width="200" />
-        <el-table-column align="center" label="通知类型" width="150">
+        <el-table-column type="index" :label="t('common.index')" width="60" />
+        <el-table-column :label="t('notice.title')" prop="title" min-width="200" />
+        <el-table-column align="center" :label="t('notice.type')" width="150">
           <template #default="scope">
             <DictTag v-model="scope.row.type" code="notice_type" />
           </template>
         </el-table-column>
-        <el-table-column align="center" label="通知等级" width="100">
+        <el-table-column align="center" :label="t('notice.level')" width="100">
           <template #default="scope">
             <DictTag v-model="scope.row.level" code="notice_level" />
           </template>
         </el-table-column>
-        <el-table-column align="center" label="目标类型" width="100">
+        <el-table-column align="center" :label="t('notice.targetType')" width="100">
           <template #default="scope">
-            <el-tag v-if="scope.row.targetType === 1" type="warning">全体</el-tag>
-            <el-tag v-else-if="scope.row.targetType === 2" type="success">指定</el-tag>
+            <el-tag v-if="scope.row.targetType === 1" type="warning">{{ t('notice.targetTypeOptions.all') }}</el-tag>
+            <el-tag v-else-if="scope.row.targetType === 2" type="success">{{ t('notice.targetTypeOptions.specified') }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column align="center" label="发布状态" width="100">
+        <el-table-column align="center" :label="t('notice.publishStatus')" width="100">
           <template #default="scope">
-            <el-tag v-if="scope.row.publishStatus === 0" type="info">草稿</el-tag>
-            <el-tag v-else-if="scope.row.publishStatus === 1" type="success">已发布</el-tag>
-            <el-tag v-else-if="scope.row.publishStatus === 2" type="primary">定时发布中</el-tag>
-            <el-tag v-else-if="scope.row.publishStatus === -1" type="warning">已撤回</el-tag>
+            <el-tag v-if="scope.row.publishStatus === 0" type="info">{{ t('notice.publishStatusOptions.draft') }}</el-tag>
+            <el-tag v-else-if="scope.row.publishStatus === 1" type="success">{{ t('notice.publishStatusOptions.published') }}</el-tag>
+            <el-tag v-else-if="scope.row.publishStatus === 2" type="primary">{{ t('notice.publishStatusOptions.scheduled') }}</el-tag>
+            <el-tag v-else-if="scope.row.publishStatus === -1" type="warning">{{ t('notice.publishStatusOptions.revoked') }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column align="center" label="发送模式" width="100">
+        <el-table-column align="center" :label="t('notice.sendMode')" width="100">
           <template #default="scope">
-            <el-tag v-if="scope.row.sendMode === 2" type="primary">定时</el-tag>
-            <span v-else>即时</span>
+            <el-tag v-if="scope.row.sendMode === 2" type="primary">{{ t('notice.sendModeOptions.scheduled') }}</el-tag>
+            <span v-else>{{ t('notice.sendModeOptions.instant') }}</span>
           </template>
         </el-table-column>
-        <el-table-column align="center" label="发送状态" width="100">
+        <el-table-column align="center" :label="t('notice.sendStatus')" width="100">
           <template #default="scope">
-            <el-tag v-if="scope.row.sendStatus === 0" type="info">待发送</el-tag>
-            <el-tag v-else-if="scope.row.sendStatus === 2" type="success">已完成</el-tag>
-            <el-tag v-else-if="scope.row.sendStatus === -1" type="danger">失败</el-tag>
-            <el-tag v-else-if="scope.row.sendStatus === -2" type="warning">已过期</el-tag>
+            <el-tag v-if="scope.row.sendStatus === 0" type="info">{{ t('notice.sendStatusOptions.pending') }}</el-tag>
+            <el-tag v-else-if="scope.row.sendStatus === 2" type="success">{{ t('notice.sendStatusOptions.completed') }}</el-tag>
+            <el-tag v-else-if="scope.row.sendStatus === -1" type="danger">{{ t('notice.sendStatusOptions.failed') }}</el-tag>
+            <el-tag v-else-if="scope.row.sendStatus === -2" type="warning">{{ t('notice.sendStatusOptions.expired') }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="时间" width="250">
+        <el-table-column :label="t('common.createTime')" width="250">
           <template #default="scope">
             <div class="flex-x-start">
-              <span>创建：</span>
+              <span>{{ t('notice.timeLabels.created') }}：</span>
               <span>{{ scope.row.createdAt || "-" }}</span>
             </div>
             <div v-if="scope.row.sendMode === 2 && scope.row.sendTime" class="flex-x-start">
-              <span>定时：</span>
+              <span>{{ t('notice.timeLabels.scheduled') }}：</span>
               <span>{{ scope.row.sendTime }}</span>
             </div>
             <div v-if="scope.row.publishStatus === 1" class="flex-x-start">
-              <span>发布：</span>
+              <span>{{ t('notice.timeLabels.published') }}：</span>
               <span>{{ scope.row.publishTime || "-" }}</span>
             </div>
             <div v-else-if="scope.row.publishStatus === -1" class="flex-x-start">
-              <span>撤回：</span>
+              <span>{{ t('notice.timeLabels.revoked') }}：</span>
               <span>{{ scope.row.revokeTime || "-" }}</span>
             </div>
           </template>
         </el-table-column>
-        <el-table-column align="center" fixed="right" label="操作" width="240">
+        <el-table-column align="center" fixed="right" :label="t('common.operation')" width="240">
           <template #default="scope">
             <el-button type="primary" size="small" link @click="openDetailDialog(scope.row.id)">
-              查看
+              {{ t('common.view') }}
             </el-button>
             <el-button
               v-if="scope.row.publishStatus === 0"
@@ -164,7 +164,7 @@
               link
               @click="handlePublish(scope.row.id)"
             >
-              发布
+              {{ t('notice.publishStatusOptions.published') }}
             </el-button>
             <el-button
               v-if="scope.row.publishStatus === 1 || scope.row.publishStatus === 2"
@@ -174,7 +174,7 @@
               link
               @click="handleRevoke(scope.row.id)"
             >
-              撤回
+              {{ t('notice.publishStatusOptions.revoked') }}
             </el-button>
             <el-button
               v-if="scope.row.sendStatus === -1"
@@ -184,7 +184,7 @@
               link
               @click="handleRetry(scope.row.id)"
             >
-              重试
+              {{ t('common.refresh') }}
             </el-button>
             <el-button
               v-if="scope.row.publishStatus === 0"
@@ -194,7 +194,7 @@
               link
               @click="openDialog(scope.row.id)"
             >
-              编辑
+              {{ t('common.edit') }}
             </el-button>
             <el-button
               v-if="scope.row.publishStatus === 0 || scope.row.publishStatus === -1"
@@ -204,7 +204,7 @@
               link
               @click="handleDelete(scope.row.id)"
             >
-              删除
+              {{ t('common.delete') }}
             </el-button>
           </template>
         </el-table-column>
@@ -249,23 +249,23 @@
         </div>
       </template>
       <el-form ref="dataFormRef" :model="formData" :rules="rules" label-width="100px">
-        <el-form-item label="通知标题" prop="title">
-          <el-input v-model="formData.title" placeholder="通知标题" clearable />
+        <el-form-item :label="t('notice.title')" prop="title">
+          <el-input v-model="formData.title" :placeholder="t('notice.title')" clearable />
         </el-form-item>
-        <el-form-item label="通知类型" prop="type">
+        <el-form-item :label="t('notice.type')" prop="type">
           <DictSelect v-model="formData.type" code="notice_type" />
         </el-form-item>
-        <el-form-item label="通知等级" prop="level">
+        <el-form-item :label="t('notice.level')" prop="level">
           <DictSelect v-model="formData.level" code="notice_level" />
         </el-form-item>
-        <el-form-item label="目标类型" prop="targetType">
+        <el-form-item :label="t('notice.targetType')" prop="targetType">
           <el-radio-group v-model="formData.targetType">
-            <el-radio :value="1">全体</el-radio>
-            <el-radio :value="2">指定用户</el-radio>
+            <el-radio :value="1">{{ t('notice.targetTypeOptions.all') }}</el-radio>
+            <el-radio :value="2">{{ t('notice.targetTypeOptions.specified') }}</el-radio>
           </el-radio-group>
         </el-form-item>
-        <el-form-item v-if="formData.targetType === 2" label="指定用户" prop="targetUserIds">
-          <el-select v-model="formData.targetUserIds" multiple filterable placeholder="请选择用户">
+        <el-form-item v-if="formData.targetType === 2" :label="t('notice.targetTypeOptions.specified')" prop="targetUserIds">
+          <el-select v-model="formData.targetUserIds" multiple filterable :placeholder="t('notice.selectUserPlaceholder')">
             <el-option
               v-for="item in userOptions"
               :key="item.value"
@@ -274,39 +274,39 @@
             />
           </el-select>
         </el-form-item>
-        <el-form-item label="发送模式" prop="sendMode">
+        <el-form-item :label="t('notice.sendMode')" prop="sendMode">
           <el-radio-group v-model="formData.sendMode">
-            <el-radio :value="1">即时</el-radio>
-            <el-radio :value="2">定时</el-radio>
+            <el-radio :value="1">{{ t('notice.sendModeOptions.instant') }}</el-radio>
+            <el-radio :value="2">{{ t('notice.sendModeOptions.scheduled') }}</el-radio>
           </el-radio-group>
         </el-form-item>
-        <el-form-item v-if="formData.sendMode === 2" label="发送时间" prop="sendTime">
+        <el-form-item v-if="formData.sendMode === 2" :label="t('notice.sendTime')" prop="sendTime">
           <el-date-picker
             v-model="formData.sendTime"
             type="datetime"
-            placeholder="选择发送时间"
+            :placeholder="t('notice.sendTimePlaceholder')"
             format="YYYY-MM-DD HH:mm"
             value-format="YYYY-MM-DDTHH:mm:ss"
             style="width: 100%"
           />
         </el-form-item>
-        <el-form-item label="有效天数" prop="expireDays">
+        <el-form-item :label="t('notice.expireDays')" prop="expireDays">
           <el-input-number
             v-model="formData.expireDays"
             :min="1"
             :max="365"
-            placeholder="留空表示不过期"
+            :placeholder="t('notice.expireDaysPlaceholder')"
             controls-position="right"
           />
         </el-form-item>
-        <el-form-item label="通知内容" prop="content">
+        <el-form-item :label="t('notice.content')" prop="content">
           <WangEditor v-model="formData.content" height="350px" />
         </el-form-item>
       </el-form>
       <template #footer>
         <div class="dialog-footer">
-          <el-button type="primary" @click="handleSubmit()">确定</el-button>
-          <el-button @click="closeDialog()">取消</el-button>
+          <el-button type="primary" @click="handleSubmit()">{{ t('common.confirm') }}</el-button>
+          <el-button @click="closeDialog()">{{ t('common.cancel') }}</el-button>
         </div>
       </template>
     </el-dialog>
@@ -321,7 +321,7 @@
     >
       <template #header>
         <div class="flex-x-between">
-          <span>通知详情</span>
+          <span>{{ t('notice.noticeDetail') }}</span>
           <div class="dialog-toolbar">
             <el-button circle @click="closeDetailDialog">
               <template #icon>
@@ -332,34 +332,34 @@
         </div>
       </template>
       <el-descriptions :column="1">
-        <el-descriptions-item label="标题：">
+        <el-descriptions-item :label="t('notice.title') + '：'">
           {{ currentNotice?.title }}
         </el-descriptions-item>
-        <el-descriptions-item label="发布状态：">
-          <el-tag v-if="currentNotice?.publishStatus === 0" type="info">草稿</el-tag>
-          <el-tag v-else-if="currentNotice?.publishStatus === 1" type="success">已发布</el-tag>
-          <el-tag v-else-if="currentNotice?.publishStatus === 2" type="primary">定时发布中</el-tag>
-          <el-tag v-else-if="currentNotice?.publishStatus === -1" type="warning">已撤回</el-tag>
+        <el-descriptions-item :label="t('notice.publishStatus') + '：'">
+          <el-tag v-if="currentNotice?.publishStatus === 0" type="info">{{ t('notice.publishStatusOptions.draft') }}</el-tag>
+          <el-tag v-else-if="currentNotice?.publishStatus === 1" type="success">{{ t('notice.publishStatusOptions.published') }}</el-tag>
+          <el-tag v-else-if="currentNotice?.publishStatus === 2" type="primary">{{ t('notice.publishStatusOptions.scheduled') }}</el-tag>
+          <el-tag v-else-if="currentNotice?.publishStatus === -1" type="warning">{{ t('notice.publishStatusOptions.revoked') }}</el-tag>
         </el-descriptions-item>
-        <el-descriptions-item label="发送模式：">
-          {{ currentNotice?.sendMode === 2 ? "定时" : "即时" }}
+        <el-descriptions-item :label="t('notice.sendMode') + '：'">
+          {{ currentNotice?.sendMode === 2 ? t('notice.sendModeOptions.scheduled') : t('notice.sendModeOptions.instant') }}
         </el-descriptions-item>
-        <el-descriptions-item v-if="currentNotice?.sendMode === 2" label="定时发送：">
+        <el-descriptions-item v-if="currentNotice?.sendMode === 2" :label="t('notice.timeLabels.scheduled') + '：'">
           {{ currentNotice?.sendTime || "-" }}
         </el-descriptions-item>
-        <el-descriptions-item label="发送状态：">
-          <el-tag v-if="currentNotice?.sendStatus === 0" type="info">待发送</el-tag>
-          <el-tag v-else-if="currentNotice?.sendStatus === 2" type="success">已完成</el-tag>
-          <el-tag v-else-if="currentNotice?.sendStatus === -1" type="danger">失败</el-tag>
-          <el-tag v-else-if="currentNotice?.sendStatus === -2" type="warning">已过期</el-tag>
+        <el-descriptions-item :label="t('notice.sendStatus') + '：'">
+          <el-tag v-if="currentNotice?.sendStatus === 0" type="info">{{ t('notice.sendStatusOptions.pending') }}</el-tag>
+          <el-tag v-else-if="currentNotice?.sendStatus === 2" type="success">{{ t('notice.sendStatusOptions.completed') }}</el-tag>
+          <el-tag v-else-if="currentNotice?.sendStatus === -1" type="danger">{{ t('notice.sendStatusOptions.failed') }}</el-tag>
+          <el-tag v-else-if="currentNotice?.sendStatus === -2" type="warning">{{ t('notice.sendStatusOptions.expired') }}</el-tag>
         </el-descriptions-item>
-        <el-descriptions-item v-if="currentNotice?.expireDays" label="有效天数：">
-          {{ currentNotice.expireDays }} 天
+        <el-descriptions-item v-if="currentNotice?.expireDays" :label="t('notice.expireDays') + '：'">
+          {{ currentNotice.expireDays }} {{ t('notice.dayUnit') }}
         </el-descriptions-item>
-        <el-descriptions-item v-if="currentNotice?.publishTime" label="发布时间：">
+        <el-descriptions-item v-if="currentNotice?.publishTime" :label="t('notice.timeLabels.published') + '：'">
           {{ currentNotice.publishTime }}
         </el-descriptions-item>
-        <el-descriptions-item label="内容：">
+        <el-descriptions-item :label="t('notice.content') + '：'">
           <div class="notice-content" v-html="currentNotice?.content" />
         </el-descriptions-item>
       </el-descriptions>
@@ -368,11 +368,7 @@
 </template>
 
 <script setup lang="ts">
-defineOptions({
-  name: "Notice",
-  inheritAttrs: false,
-});
-
+import { useI18n } from "vue-i18n";
 import { useFullscreen } from "@vueuse/core";
 import NoticeAPI from "@/api/system/notice";
 import type {
@@ -384,6 +380,13 @@ import type {
 import UserAPI from "@/api/system/user";
 import type { OptionItem } from "@/api/common";
 import type { FormInstance, FormRules } from "element-plus";
+
+const { t } = useI18n();
+
+defineOptions({
+  name: "Notice",
+  inheritAttrs: false,
+});
 
 const tableWrapperRef = ref<HTMLElement | null>(null);
 const { toggle: toggleFullscreen } = useFullscreen(tableWrapperRef);
@@ -433,28 +436,28 @@ function defaultForm(): NoticeForm {
 
 const formData = reactive<NoticeForm>(defaultForm());
 
-const rules: FormRules = {
-  title: [{ required: true, message: "请输入通知标题", trigger: "blur" }],
+const rules = computed<FormRules>(() => ({
+  title: [{ required: true, message: t("notice.messages.enterTitle"), trigger: "blur" }],
   content: [
     {
       required: true,
-      message: "请输入通知内容",
+      message: t("notice.messages.enterContent"),
       trigger: "blur",
       validator: (_rule, value: string, callback) => {
         if (!value || !value.replace(/<[^>]+>/g, "").trim()) {
-          callback(new Error("请输入通知内容"));
+          callback(new Error(t("notice.messages.enterContent")));
         } else {
           callback();
         }
       },
     },
   ],
-  type: [{ required: true, message: "请选择通知类型", trigger: "change" }],
+  type: [{ required: true, message: t("notice.messages.selectType"), trigger: "change" }],
   targetUserIds: [
     {
       validator: (_rule, value: number[] | undefined, callback) => {
         if (formData.targetType === 2 && (value ?? []).length === 0) {
-          callback(new Error("请选择指定用户"));
+          callback(new Error(t("notice.messages.selectUser")));
         } else {
           callback();
         }
@@ -466,7 +469,7 @@ const rules: FormRules = {
     {
       validator: (_rule, value: string | undefined, callback) => {
         if (formData.sendMode === 2 && !value) {
-          callback(new Error("定时发送必须选择发送时间"));
+          callback(new Error(t("notice.messages.scheduledMustSelectTime")));
         } else {
           callback();
         }
@@ -474,7 +477,7 @@ const rules: FormRules = {
       trigger: "change",
     },
   ],
-};
+}));
 
 const detailDialog = reactive({ visible: false });
 const currentNotice = ref<NoticeDetail | null>(null);
@@ -520,7 +523,7 @@ function openDialog(id?: string): void {
   loadUserOptions();
 
   if (id) {
-    dialogState.title = "修改通知";
+    dialogState.title = t("notice.editNotice");
     NoticeAPI.getDetail(id).then((data) => {
       Object.assign(formData, {
         id: data.id,
@@ -537,7 +540,7 @@ function openDialog(id?: string): void {
     });
   } else {
     Object.assign(formData, defaultForm());
-    dialogState.title = "新增通知";
+    dialogState.title = t("notice.addNotice");
   }
 
   dialogState.visible = true;
@@ -545,21 +548,21 @@ function openDialog(id?: string): void {
 
 function handlePublish(id: string): void {
   NoticeAPI.publish(id).then(() => {
-    ElMessage.success("发布成功");
+    ElMessage.success(t("notice.messages.publishSuccess"));
     fetchData();
   });
 }
 
 function handleRevoke(id: string): void {
   NoticeAPI.revoke(id).then(() => {
-    ElMessage.success("撤回成功");
+    ElMessage.success(t("notice.messages.revokeSuccess"));
     fetchData();
   });
 }
 
 function handleRetry(id: string): void {
   NoticeAPI.retry(id).then(() => {
-    ElMessage.success("已重新发送");
+    ElMessage.success(t("notice.messages.retried"));
     fetchData();
   });
 }
@@ -588,7 +591,7 @@ function handleSubmit(): void {
 
     req
       .then(() => {
-        ElMessage.success(formData.id ? "修改成功" : "新增成功");
+        ElMessage.success(formData.id ? t("common.editSuccess") : t("common.addSuccess"));
         closeDialog();
         handleResetQuery();
       })
@@ -611,26 +614,26 @@ function toggleDialogFullscreen(): void {
 function handleDelete(id?: string): void {
   const deleteIds = id ?? selectIds.value.join(",");
   if (!deleteIds) {
-    ElMessage.warning("请勾选删除项");
+    ElMessage.warning(t("common.selectDeleteItem"));
     return;
   }
 
-  ElMessageBox.confirm("确认删除已选中的数据项吗？", "警告", {
-    confirmButtonText: "确定",
-    cancelButtonText: "取消",
+  ElMessageBox.confirm(t("common.confirmDelete"), t("common.warning"), {
+    confirmButtonText: t("common.confirm"),
+    cancelButtonText: t("common.cancel"),
     type: "warning",
   }).then(
     () => {
       loading.value = true;
       NoticeAPI.deleteByIds(deleteIds)
         .then(() => {
-          ElMessage.success("删除成功");
+          ElMessage.success(t("common.deleteSuccess"));
           handleResetQuery();
         })
         .finally(() => (loading.value = false));
     },
     () => {
-      ElMessage.info("已取消删除");
+      ElMessage.info(t("common.deleteCancelled"));
     },
   );
 }

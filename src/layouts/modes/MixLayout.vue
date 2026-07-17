@@ -19,7 +19,7 @@
               <template v-if="item.meta">
                 <LayoutMenuIcon :icon="item.meta.icon" />
                 <span v-if="item.meta.title" class="ml-1">
-                  {{ translateRouteTitle(item.meta.title) }}
+                  {{ translateRouteTitle(item.meta.title, String(item.name || '')) }}
                 </span>
               </template>
             </el-menu-item>

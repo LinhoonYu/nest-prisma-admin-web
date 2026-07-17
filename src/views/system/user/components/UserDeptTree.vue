@@ -1,6 +1,6 @@
 <template>
   <el-card shadow="never" class="dept-card">
-    <el-input v-model="deptName" class="dept-card__search" placeholder="搜索部门" clearable>
+    <el-input v-model="deptName" class="dept-card__search" :placeholder="t('user.searchDept')" clearable>
       <template #prefix>
         <el-icon><Search /></el-icon>
       </template>
@@ -20,10 +20,13 @@
 </template>
 
 <script setup lang="ts">
+import { useI18n } from "vue-i18n";
 import DeptAPI from "@/api/system/dept";
 import type { DeptItem } from "@/api/system/dept";
 import type { OptionItem } from "@/api/common";
 import type { TreeNodeData } from "element-plus/es/components/tree";
+
+const { t } = useI18n();
 
 const props = defineProps({
   modelValue: {

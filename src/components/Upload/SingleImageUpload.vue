@@ -33,11 +33,14 @@
 
 <script setup lang="ts">
 import { computed } from "vue";
+import { useI18n } from "vue-i18n";
 import { UploadRawFile, UploadRequestOptions } from "element-plus";
 
 import FileAPI from "@/api/file";
 import { fileProxyUrl } from "@/api/file";
 import type { FileInfo } from "@/api/file";
+
+const { t } = useI18n();
 
 const props = defineProps({
   data: {
@@ -79,12 +82,12 @@ function handleBeforeUpload(file: UploadRawFile) {
   });
 
   if (!isValidType) {
-    ElMessage.warning("上传文件的格式不正确，仅支持 " + props.accept);
+    ElMessage.warning(t("upload.invalidFormat", { accept: props.accept }));
     return false;
   }
 
   if (file.size > props.maxFileSize * 1024 * 1024) {
-    ElMessage.warning("上传图片不能大于" + props.maxFileSize + "M");
+    ElMessage.warning(t("upload.imageTooLarge", { size: props.maxFileSize }));
     return false;
   }
   return true;
@@ -109,7 +112,7 @@ function handleDelete() {
 }
 
 const onSuccess = (fileInfo: FileInfo) => {
-  ElMessage.success("上传成功");
+  ElMessage.success(t("upload.success"));
   modelValue.value = fileInfo.id;
 };
 
@@ -117,7 +120,7 @@ const getErrorMessage = (error: unknown) =>
   error instanceof Error ? error.message : String(error);
 
 const onError = (error: unknown) => {
-  ElMessage.error("上传失败: " + getErrorMessage(error));
+  ElMessage.error(t("upload.failedWithError", { error: getErrorMessage(error) }));
 };
 </script>
 

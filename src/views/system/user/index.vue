@@ -19,39 +19,39 @@
         <!-- 搜索区域 -->
         <el-card shadow="never" class="page-search">
           <el-form ref="queryFormRef" :model="tableData.params" :inline="true" label-width="auto">
-            <el-form-item label="用户名" prop="username">
+            <el-form-item :label="t('user.username')" prop="username">
               <el-input
                 v-model="tableData.params.username"
-                placeholder="用户名"
+                :placeholder="t('user.username')"
                 clearable
                 @keyup.enter="handleQuery"
               />
             </el-form-item>
 
-            <el-form-item label="昵称" prop="nickname">
+            <el-form-item :label="t('user.nickname')" prop="nickname">
               <el-input
                 v-model="tableData.params.nickname"
-                placeholder="昵称"
+                :placeholder="t('user.nickname')"
                 clearable
                 @keyup.enter="handleQuery"
               />
             </el-form-item>
 
-            <el-form-item label="状态" prop="status">
+            <el-form-item :label="t('common.status')" prop="status">
               <el-select
                 v-model="tableData.params.status"
-                placeholder="全部"
+                :placeholder="t('common.all')"
                 clearable
                 style="width: 100px"
               >
-                <el-option label="正常" :value="1" />
-                <el-option label="禁用" :value="0" />
+                <el-option :label="t('common.enabled')" :value="1" />
+                <el-option :label="t('common.disabled')" :value="0" />
               </el-select>
             </el-form-item>
 
             <el-form-item>
-              <el-button type="primary" @click="handleQuery">搜索</el-button>
-              <el-button @click="handleResetQuery">重置</el-button>
+              <el-button type="primary" @click="handleQuery">{{ t('common.search') }}</el-button>
+              <el-button @click="handleResetQuery">{{ t('common.reset') }}</el-button>
             </el-form-item>
           </el-form>
         </el-card>
@@ -64,7 +64,7 @@
                 type="primary"
                 @click="handleCreateClick"
               >
-                新增
+                {{ t('common.add') }}
               </el-button>
               <el-button
                 v-hasPerm="'iam:user:delete'"
@@ -72,16 +72,16 @@
                 :disabled="!hasSelection"
                 @click="handleDelete()"
               >
-                删除
+                {{ t('common.delete') }}
               </el-button>
             </div>
             <div class="page-toolbar__right">
-              <el-tooltip content="刷新" placement="top">
+              <el-tooltip :content="t('common.refresh')" placement="top">
                 <el-button class="page-icon-btn" @click="handleQuery">
                   <el-icon><Refresh /></el-icon>
                 </el-button>
               </el-tooltip>
-              <el-tooltip content="全屏" placement="top">
+              <el-tooltip :content="t('common.fullscreen')" placement="top">
                 <el-button class="page-icon-btn" @click="toggleFullscreen">
                   <el-icon><FullScreen /></el-icon>
                 </el-button>
@@ -102,20 +102,20 @@
             @selection-change="handleSelectionChange"
           >
             <el-table-column type="selection" width="50" align="center" />
-            <el-table-column label="用户名" prop="username" min-width="120" show-overflow-tooltip />
-            <el-table-column label="昵称" width="160" align="center" prop="nickname" />
-            <el-table-column label="真实姓名" width="120" align="center" prop="realName" />
-            <el-table-column label="手机号码" align="center" prop="phone" width="120" />
-            <el-table-column label="邮箱" align="center" prop="email" width="160" show-overflow-tooltip />
-            <el-table-column label="状态" align="center" prop="status" width="80">
+            <el-table-column :label="t('user.username')" prop="username" min-width="120" show-overflow-tooltip />
+            <el-table-column :label="t('user.nickname')" width="160" align="center" prop="nickname" />
+            <el-table-column :label="t('user.realName')" width="120" align="center" prop="realName" />
+            <el-table-column :label="t('user.phone')" align="center" prop="phone" width="120" />
+            <el-table-column :label="t('user.email')" align="center" prop="email" width="160" show-overflow-tooltip />
+            <el-table-column :label="t('common.status')" align="center" prop="status" width="80">
               <template #default="scope">
                 <el-tag :type="scope.row.status === CommonStatus.ENABLED ? 'success' : 'info'">
-                  {{ scope.row.status === CommonStatus.ENABLED ? "正常" : "禁用" }}
+                  {{ scope.row.status === CommonStatus.ENABLED ? t('common.enabled') : t('common.disabled') }}
                 </el-tag>
               </template>
             </el-table-column>
-            <el-table-column label="创建时间" align="center" prop="createdAt" width="180" />
-            <el-table-column label="操作" fixed="right" width="220">
+            <el-table-column :label="t('common.createTime')" align="center" prop="createdAt" width="180" />
+            <el-table-column :label="t('common.operation')" fixed="right" width="220">
               <template #default="scope">
                 <el-button
                   v-hasPerm="'iam:user:reset-password'"
@@ -124,7 +124,7 @@
                   link
                   @click="handleResetPassword(scope.row)"
                 >
-                  重置密码
+                  {{ t('user.resetPassword') }}
                 </el-button>
                 <el-button
                   v-hasPerm="'iam:user:update'"
@@ -133,7 +133,7 @@
                   size="small"
                   @click="handleEditClick(scope.row.id)"
                 >
-                  编辑
+                  {{ t('common.edit') }}
                 </el-button>
                 <el-button
                   v-hasPerm="'iam:user:delete'"
@@ -142,7 +142,7 @@
                   size="small"
                   @click="handleDelete(scope.row.id)"
                 >
-                  删除
+                  {{ t('common.delete') }}
                 </el-button>
               </template>
             </el-table-column>
@@ -169,30 +169,30 @@
       @close="closeDialog"
     >
       <el-form ref="userFormRef" :model="formData" :rules="rules" label-width="80px">
-        <el-form-item label="用户名" prop="username">
+        <el-form-item :label="t('user.username')" prop="username">
           <el-input
             v-model="formData.username"
             :readonly="!!editingId"
-            placeholder="请输入用户名"
+            :placeholder="t('user.messages.enterUsername')"
           />
         </el-form-item>
 
-        <el-form-item v-if="!editingId" label="密码" prop="password">
-          <el-input v-model="formData.password" type="password" show-password placeholder="请输入初始密码" />
+        <el-form-item v-if="!editingId" :label="t('user.password')" prop="password">
+          <el-input v-model="formData.password" type="password" show-password :placeholder="t('user.initialPassword')" />
         </el-form-item>
 
-        <el-form-item label="用户昵称" prop="nickname">
-          <el-input v-model="formData.nickname" placeholder="请输入用户昵称" />
+        <el-form-item :label="t('user.nickname')" prop="nickname">
+          <el-input v-model="formData.nickname" :placeholder="t('user.messages.enterNickname')" />
         </el-form-item>
 
-        <el-form-item label="真实姓名" prop="realName">
-          <el-input v-model="formData.realName" placeholder="请输入真实姓名" />
+        <el-form-item :label="t('user.realName')" prop="realName">
+          <el-input v-model="formData.realName" :placeholder="t('user.messages.enterRealName')" />
         </el-form-item>
 
-        <el-form-item label="所属部门" prop="deptId">
+        <el-form-item :label="t('user.dept')" prop="deptId">
           <el-tree-select
             v-model="formData.deptId"
-            placeholder="请选择所属部门"
+            :placeholder="t('user.messages.selectDept')"
             :data="deptOptions"
             filterable
             check-strictly
@@ -200,16 +200,16 @@
           />
         </el-form-item>
 
-        <el-form-item label="性别" prop="gender">
-          <el-select v-model="formData.gender" placeholder="请选择">
-            <el-option label="未知" :value="0" />
-            <el-option label="男" :value="1" />
-            <el-option label="女" :value="2" />
+        <el-form-item :label="t('user.gender')" prop="gender">
+          <el-select v-model="formData.gender" :placeholder="t('common.all')">
+            <el-option :label="t('user.genderOptions.unknown')" :value="0" />
+            <el-option :label="t('user.genderOptions.male')" :value="1" />
+            <el-option :label="t('user.genderOptions.female')" :value="2" />
           </el-select>
         </el-form-item>
 
-        <el-form-item label="角色" prop="roleIds">
-          <el-select v-model="selectedRoleIds" multiple placeholder="请选择">
+        <el-form-item :label="t('user.role')" prop="roleIds">
+          <el-select v-model="selectedRoleIds" multiple :placeholder="t('common.all')">
             <el-option
               v-for="item in roleOptions"
               :key="item.value"
@@ -219,20 +219,20 @@
           </el-select>
         </el-form-item>
 
-        <el-form-item label="手机号码" prop="phone">
-          <el-input v-model="formData.phone" placeholder="请输入手机号码" />
+        <el-form-item :label="t('user.phone')" prop="phone">
+          <el-input v-model="formData.phone" :placeholder="t('user.messages.enterPhone')" />
         </el-form-item>
 
-        <el-form-item label="邮箱" prop="email">
-          <el-input v-model="formData.email" placeholder="请输入邮箱" />
+        <el-form-item :label="t('user.email')" prop="email">
+          <el-input v-model="formData.email" :placeholder="t('user.messages.enterEmail')" />
         </el-form-item>
 
-        <el-form-item label="状态" prop="status">
+        <el-form-item :label="t('common.status')" prop="status">
           <el-switch
             v-model="formData.status"
             inline-prompt
-            active-text="正常"
-            inactive-text="禁用"
+            :active-text="t('common.enabled')"
+            :inactive-text="t('common.disabled')"
             :active-value="CommonStatus.ENABLED"
             :inactive-value="CommonStatus.DISABLED"
           />
@@ -241,8 +241,8 @@
 
       <template #footer>
         <div class="dialog-footer">
-          <el-button type="primary" @click="handleSubmit">确 定</el-button>
-          <el-button @click="closeDialog">取 消</el-button>
+          <el-button type="primary" @click="handleSubmit">{{ t('common.confirm') }}</el-button>
+          <el-button @click="closeDialog">{{ t('common.cancel') }}</el-button>
         </div>
       </template>
     </el-drawer>
@@ -252,6 +252,7 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref } from "vue";
 import { useDebounceFn, useFullscreen } from "@vueuse/core";
+import { useI18n } from "vue-i18n";
 import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from "element-plus";
 import { ArrowLeft, ArrowRight } from "@element-plus/icons-vue";
 import type { UserForm, UserItem, UserDetail } from "@/api/system/user";
@@ -265,6 +266,8 @@ import { useUserStore, useAppStore } from "@/stores";
 import { DeviceEnum, DialogMode, CommonStatus } from "@/enums";
 import { useTableSelection } from "@/composables";
 import UserDeptTree from "./components/UserDeptTree.vue";
+
+const { t } = useI18n();
 
 defineOptions({
   name: "User",
@@ -307,7 +310,7 @@ const tableData = reactive<{
 // 弹窗状态
 const dialogState = reactive({
   visible: false,
-  title: "新增用户",
+  title: t("user.addUser"),
   mode: DialogMode.CREATE,
 });
 
@@ -334,11 +337,11 @@ const roleOptions = ref<OptionItem[]>();
 
 const drawerSize = computed(() => (appStore.device === DeviceEnum.DESKTOP ? "600px" : "90%"));
 
-const rules: FormRules = {
-  username: [{ required: true, message: "请输入用户名", trigger: "blur" }],
-  password: [{ required: true, message: "请输入初始密码", trigger: "blur" }],
-  email: [{ type: "email", message: "请输入正确的邮箱地址", trigger: "blur" }],
-};
+const rules = computed<FormRules>(() => ({
+  username: [{ required: true, message: t("user.messages.enterUsername"), trigger: "blur" }],
+  password: [{ required: true, message: t("user.initialPassword"), trigger: "blur" }],
+  email: [{ type: "email", message: t("user.messages.enterCorrectEmail"), trigger: "blur" }],
+}));
 
 /**
  * 加载用户列表数据
@@ -404,7 +407,7 @@ function handleResetQuery(): void {
  */
 async function resetPassword(userId: string, password: string): Promise<void> {
   await UserAPI.resetPassword(userId, { password });
-  ElMessage.success("密码重置成功");
+  ElMessage.success(t("user.messages.passwordResetSuccess"));
 }
 
 /**
@@ -413,7 +416,7 @@ async function resetPassword(userId: string, password: string): Promise<void> {
 async function deleteUsers(userIds: string[]): Promise<void> {
   // 后端仅支持单个删除，逐个调用
   await Promise.all(userIds.map((id) => UserAPI.deleteById(id)));
-  ElMessage.success("删除成功");
+  ElMessage.success(t("common.deleteSuccess"));
   handleQuery();
 }
 
@@ -440,11 +443,11 @@ function resetForm(): void {
  * 重置密码按钮点击事件
  */
 function handleResetPassword(row: UserItem): void {
-  ElMessageBox.prompt(`请输入用户【${row.username}】的新密码`, "重置密码", {
-    confirmButtonText: "确定",
-    cancelButtonText: "取消",
+  ElMessageBox.prompt(t("user.messages.enterNewPassword", { name: row.username }), t("user.resetPassword"), {
+    confirmButtonText: t("common.confirm"),
+    cancelButtonText: t("common.cancel"),
     inputPattern: /.{6,}/,
-    inputErrorMessage: "密码至少需要6位字符",
+    inputErrorMessage: t("user.messages.passwordMinLength"),
   }).then(
     (result: { value: string }) => resetPassword(row.id, result.value),
     () => {
@@ -457,7 +460,7 @@ function handleResetPassword(row: UserItem): void {
  * 新增按钮点击事件
  */
 async function handleCreateClick(): Promise<void> {
-  dialogState.title = "新增用户";
+  dialogState.title = t("user.addUser");
   dialogState.mode = DialogMode.CREATE;
   await loadFormOptions();
   dialogState.visible = true;
@@ -467,7 +470,7 @@ async function handleCreateClick(): Promise<void> {
  * 编辑按钮点击事件
  */
 async function handleEditClick(id: string): Promise<void> {
-  dialogState.title = "修改用户";
+  dialogState.title = t("user.editUser");
   dialogState.mode = DialogMode.EDIT;
   await loadFormOptions();
   const detail = await UserAPI.getDetail(id);
@@ -504,11 +507,11 @@ const handleSubmit = useDebounceFn(async () => {
       await UserAPI.update(editingId.value, updateData);
       // 分配角色
       await UserAPI.assignRoles(editingId.value, { roleIds: selectedRoleIds.value });
-      ElMessage.success("修改用户成功");
+      ElMessage.success(t("user.messages.editSuccess"));
     } else {
       // 新增用户
       await UserAPI.create(formData);
-      ElMessage.success("新增用户成功");
+      ElMessage.success(t("user.messages.addSuccess"));
     }
     closeDialog();
     handleQuery();
@@ -523,20 +526,20 @@ const handleSubmit = useDebounceFn(async () => {
 function handleDelete(id?: string): void {
   const ids = id ? [id] : selectedIds.value.map(String);
   if (ids.length === 0) {
-    ElMessage.warning("请勾选删除项");
+    ElMessage.warning(t("common.selectDeleteItem"));
     return;
   }
 
   // 安全检查：防止删除当前登录用户
   const currentUserId = userStore.userInfo?.userId;
   if (currentUserId && ids.includes(currentUserId)) {
-    ElMessage.error("不能删除当前登录用户");
+    ElMessage.error(t("user.messages.cannotDeleteSelf"));
     return;
   }
 
-  ElMessageBox.confirm("确认删除选中的用户吗？", "警告", {
-    confirmButtonText: "确定",
-    cancelButtonText: "取消",
+  ElMessageBox.confirm(t("common.confirmDelete"), t("common.warning"), {
+    confirmButtonText: t("common.confirm"),
+    cancelButtonText: t("common.cancel"),
     type: "warning",
   }).then(
     () => deleteUsers(ids),

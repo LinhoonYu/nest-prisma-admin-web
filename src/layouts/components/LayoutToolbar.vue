@@ -123,9 +123,9 @@ const navbarActionsClass = computed(() => {
  * 退出登录
  */
 function logout() {
-  ElMessageBox.confirm("确定注销并退出系统吗？", "提示", {
-    confirmButtonText: "确定",
-    cancelButtonText: "取消",
+  ElMessageBox.confirm(t("navbar.logoutConfirm"), t("request.tip"), {
+    confirmButtonText: t("common.confirm"),
+    cancelButtonText: t("common.cancel"),
     type: "warning",
     lockScroll: false,
   }).then(() => {

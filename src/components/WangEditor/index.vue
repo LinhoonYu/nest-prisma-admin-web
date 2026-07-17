@@ -28,9 +28,12 @@ import "@wangeditor-next/editor/dist/css/style.css";
 import { Toolbar, Editor } from "@wangeditor-next/editor-for-vue";
 import { IToolbarConfig, IEditorConfig } from "@wangeditor-next/editor";
 import { shallowRef, ref, watch, onBeforeUnmount } from "vue";
+import { useI18n } from "vue-i18n";
 
 import FileAPI from "@/api/file";
 import { fileProxyUrl } from "@/api/file";
+
+const { t } = useI18n();
 
 type InsertFnType = (_url: string, _alt: string, _href: string) => void;
 
@@ -57,7 +60,7 @@ const toolbarConfig: Partial<IToolbarConfig> = {};
 
 // 编辑器配置
 const editorConfig: Partial<IEditorConfig> = {
-  placeholder: "请输入内容...",
+  placeholder: t("wangEditor.placeholder"),
   MENU_CONF: {
     uploadImage: {
       async customUpload(file: File, insertFn: InsertFnType) {

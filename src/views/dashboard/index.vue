@@ -26,7 +26,7 @@
         </div>
         <div class="stat-card__body">
           <span class="stat-card__num">{{ onlineUserCount }}</span>
-          <span class="stat-card__label">在线用户</span>
+          <span class="stat-card__label">{{ t("dashboard.onlineUsers") }}</span>
         </div>
         <span
           :class="[
@@ -34,7 +34,7 @@
             isConnected ? 'stat-card__badge--on' : 'stat-card__badge--off',
           ]"
         >
-          {{ isConnected ? "实时" : "离线" }}
+          {{ isConnected ? t("dashboard.realtime") : t("dashboard.offline") }}
         </span>
       </div>
 
@@ -44,7 +44,7 @@
         </div>
         <div class="stat-card__body">
           <span class="stat-card__num">{{ todayLoginCount }}</span>
-          <span class="stat-card__label">今日登录</span>
+          <span class="stat-card__label">{{ t("dashboard.todayLogin") }}</span>
         </div>
       </div>
 
@@ -54,7 +54,7 @@
         </div>
         <div class="stat-card__body">
           <span class="stat-card__num">{{ unreadNoticeCount }}</span>
-          <span class="stat-card__label">未读通知</span>
+          <span class="stat-card__label">{{ t("dashboard.unreadNotices") }}</span>
         </div>
       </div>
 
@@ -64,7 +64,7 @@
         </div>
         <div class="stat-card__body">
           <span class="stat-card__num">1,566</span>
-          <span class="stat-card__label">系统用户</span>
+          <span class="stat-card__label">{{ t("dashboard.systemUsers") }}</span>
         </div>
         <span class="stat-card__trend stat-card__trend--up">
           <el-icon :size="12"><ArrowUp /></el-icon>
@@ -76,7 +76,7 @@
     <section class="dash-middle">
       <div class="card dash-middle__map">
         <div class="card__head">
-          <h3 class="card__title">用户区域分布</h3>
+          <h3 class="card__title">{{ t("dashboard.userDistribution") }}</h3>
         </div>
         <div class="card__body card__body--flush">
           <ECharts :options="mapOptions" height="640px" />
@@ -86,8 +86,8 @@
       <div class="dash-middle__side">
         <div class="card dash-side-card">
           <div class="card__head">
-            <h3 class="card__title">最近登录</h3>
-            <el-tag size="small" round>{{ loginLogs.length }} 条</el-tag>
+            <h3 class="card__title">{{ t("dashboard.recentLogins") }}</h3>
+            <el-tag size="small" round>{{ loginLogs.length }} {{ t("dashboard.records") }}</el-tag>
           </div>
           <div class="card__body card__body--scroll dash-side-card__body">
             <div v-if="loginLogs.length" class="log-list">
@@ -118,14 +118,14 @@
                 <span class="log-row__time">{{ formatTime(item.createdAt) }}</span>
               </div>
             </div>
-            <el-empty v-else description="暂无登录记录" :image-size="60" />
+            <el-empty v-else :description="t('dashboard.noLoginRecords')" :image-size="60" />
           </div>
         </div>
 
         <div class="card dash-side-card">
           <div class="card__head">
-            <h3 class="card__title">最新通知 / 公告</h3>
-            <el-tag size="small" round>{{ notices.length }} 条</el-tag>
+            <h3 class="card__title">{{ t("dashboard.latestNotices") }}</h3>
+            <el-tag size="small" round>{{ notices.length }} {{ t("dashboard.records") }}</el-tag>
           </div>
           <div class="card__body card__body--scroll dash-side-card__body">
             <div v-if="notices.length" class="notice-list">
@@ -141,7 +141,7 @@
                 <span class="notice-row__time">{{ formatTime(item.publishTime) }}</span>
               </div>
             </div>
-            <el-empty v-else description="暂无通知 / 公告" :image-size="60" />
+            <el-empty v-else :description="t('dashboard.noNotices')" :image-size="60" />
           </div>
         </div>
       </div>
@@ -157,6 +157,7 @@ import { MapChart } from "echarts/charts";
 import { GeoComponent, VisualMapComponent } from "echarts/components";
 import { dayjs } from "element-plus";
 import { ref, computed, onMounted } from "vue";
+import { useI18n } from "vue-i18n";
 import type { LoginLogItem, LoginLogQueryParams } from "@/api/system/login-log/types";
 import type { MyNoticeItem } from "@/api/system/notice/types";
 import LoginLogAPI from "@/api/system/login-log";
@@ -181,47 +182,49 @@ echarts.use([MapChart, GeoComponent, VisualMapComponent]);
 echarts.registerMap("china", chinaJson as Parameters<typeof echarts.registerMap>[1]);
 
 const userStore = useUserStore();
+const { t } = useI18n();
 const { onlineUserCount, isConnected } = useOnlineCount();
 
 const hours = new Date().getHours();
 const greetings = computed(() => {
   const n = userStore.userInfo.nickname || userStore.userInfo.username;
-  if (hours >= 6 && hours < 8) return `早安，${n}`;
-  if (hours >= 8 && hours < 12) return `上午好，${n}`;
-  if (hours >= 12 && hours < 18) return `下午好，${n}`;
-  if (hours >= 18 && hours < 24) return `晚上好，${n}`;
-  return `夜深了，${n}`;
+  if (hours >= 6 && hours < 8) return t("dashboard.greeting.morning", { name: n });
+  if (hours >= 8 && hours < 12) return t("dashboard.greeting.forenoon", { name: n });
+  if (hours >= 12 && hours < 18) return t("dashboard.greeting.afternoon", { name: n });
+  if (hours >= 18 && hours < 24) return t("dashboard.greeting.evening", { name: n });
+  return t("dashboard.greeting.lateNight", { name: n });
 });
 
 const currentDateStr = computed(() => {
   const d = new Date();
-  const w = ["日", "一", "二", "三", "四", "五", "六"];
-  return `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日 星期${w[d.getDay()]}`;
+  const weekdayKeys = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"];
+  const w = weekdayKeys.map((k) => t(`dashboard.weekdays.${k}`));
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")} ${w[d.getDay()]}`;
 });
 
-function formatTime(t?: string) {
-  if (!t) return "—";
-  const d = dayjs(t);
+function formatTime(t2?: string) {
+  if (!t2) return "—";
+  const d = dayjs(t2);
   const now = dayjs();
   const diffMin = now.diff(d, "minute");
-  if (diffMin < 1) return "刚刚";
-  if (diffMin < 60) return `${diffMin}分钟前`;
+  if (diffMin < 1) return t("dashboard.time.justNow");
+  if (diffMin < 60) return t("dashboard.time.minutesAgo", { n: diffMin });
   const diffHour = now.diff(d, "hour");
-  if (diffHour < 24) return `${diffHour}小时前`;
+  if (diffHour < 24) return t("dashboard.time.hoursAgo", { n: diffHour });
   const diffDay = now.diff(d, "day");
-  if (diffDay < 7) return `${diffDay}天前`;
+  if (diffDay < 7) return t("dashboard.time.daysAgo", { n: diffDay });
   return d.format("MM-DD HH:mm");
 }
 
 function loginTypeLabel(type: number) {
   const map: Record<number, string> = {
-    1: "密码",
-    2: "第三方",
+    1: t("dashboard.loginType.password"),
+    2: t("dashboard.loginType.thirdParty"),
     3: "GitHub",
     4: "Gitee",
     5: "Google",
   };
-  return map[type] ?? "其他";
+  return map[type] ?? t("dashboard.loginType.other");
 }
 
 type LoginProviderType = "password" | "github" | "gitee" | "google" | "other";
@@ -296,14 +299,14 @@ const mapOptions = computed(() => ({
     borderWidth: 0,
     padding: [8, 12],
     formatter: (params: { name: string; value: number; data?: { name: string; value: number } }) => {
-      if (!params.data) return `${params.name}<br/>暂无数据`;
-      return `${params.name}<br/>用户数：<b>${params.data.value}</b>`;
+      if (!params.data) return `${params.name}<br/>${t("dashboard.noData")}`;
+      return `${params.name}<br/>${t("dashboard.userCount")}：<b>${params.data.value}</b>`;
     },
   },
   visualMap: {
     min: 0,
     max: 3500,
-    text: ["高", "低"],
+    text: [t("dashboard.level.high"), t("dashboard.level.low")],
     textStyle: { fontSize: 12 },
     inRange: {
       color: ["#e6f2ff", "#91c8ff", "#409eff", "#1c6fbf", "#0d3b6e"],

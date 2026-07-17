@@ -2,10 +2,10 @@
   <div class="page-container">
     <el-card class="page-search" shadow="never">
       <el-form ref="queryFormRef" :model="params" :inline="true">
-        <el-form-item label="通知标题" prop="title">
+        <el-form-item :label="t('myNotice.title')" prop="title">
           <el-input
             v-model="params.title"
-            placeholder="关键字"
+            :placeholder="t('myNotice.keywords')"
             clearable
             @keyup.enter="handleQuery"
           />
@@ -16,13 +16,13 @@
             <template #icon>
               <Search />
             </template>
-            搜索
+            {{ t('common.search') }}
           </el-button>
           <el-button @click="handleResetQuery">
             <template #icon>
               <Refresh />
             </template>
-            重置
+            {{ t('common.reset') }}
           </el-button>
         </el-form-item>
       </el-form>
@@ -37,34 +37,34 @@
           height="100%"
           highlight-current-row
         >
-          <el-table-column type="index" label="序号" width="60" />
-          <el-table-column label="通知标题" prop="title" min-width="200" />
-          <el-table-column align="center" label="通知类型" width="150">
+          <el-table-column type="index" :label="t('common.index')" width="60" />
+          <el-table-column :label="t('myNotice.title')" prop="title" min-width="200" />
+          <el-table-column align="center" :label="t('myNotice.noticeType')" width="150">
             <template #default="scope">
               <DictTag v-model="scope.row.type" code="notice_type" />
             </template>
           </el-table-column>
-          <el-table-column align="center" label="通知等级" width="100">
+          <el-table-column align="center" :label="t('myNotice.noticeLevel')" width="100">
             <template #default="scope">
               <DictTag v-model="scope.row.level" code="notice_level" />
             </template>
           </el-table-column>
           <el-table-column
             align="center"
-            label="发布时间"
+            :label="t('myNotice.publishTime')"
             prop="publishTime"
             width="180"
           />
-          <el-table-column align="center" label="状态" width="100">
+          <el-table-column align="center" :label="t('common.status')" width="100">
             <template #default="scope">
-              <el-tag v-if="scope.row.isRead === 1" type="success">已读</el-tag>
-              <el-tag v-else type="info">未读</el-tag>
+              <el-tag v-if="scope.row.isRead === 1" type="success">{{ t('myNotice.read') }}</el-tag>
+              <el-tag v-else type="info">{{ t('myNotice.unread') }}</el-tag>
             </template>
           </el-table-column>
-          <el-table-column align="center" fixed="right" label="操作" width="80">
+          <el-table-column align="center" fixed="right" :label="t('common.operation')" width="80">
             <template #default="scope">
               <el-button type="primary" size="small" link @click="handleReadNotice(scope.row.id)">
-                查看
+                {{ t('common.view') }}
               </el-button>
             </template>
           </el-table-column>
@@ -82,7 +82,7 @@
 
     <el-dialog
       v-model="noticeDialogVisible"
-      :title="noticeDetail?.title ?? '通知详情'"
+      :title="noticeDetail?.title ?? t('myNotice.noticeDetail')"
       width="800px"
       custom-class="notice-detail"
     >
@@ -104,6 +104,7 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
+import { useI18n } from "vue-i18n";
 import { Refresh, Search, Timer, User } from "@element-plus/icons-vue";
 
 import NoticeAPI from "@/api/system/notice";
@@ -114,6 +115,8 @@ defineOptions({
   name: "MyNotice",
   inheritAttrs: false,
 });
+
+const { t } = useI18n();
 
 const NOTICE_READ = 1;
 

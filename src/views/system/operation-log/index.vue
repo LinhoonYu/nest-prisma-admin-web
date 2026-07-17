@@ -2,40 +2,40 @@
   <div class="page-container">
     <el-card class="page-search" shadow="never">
       <el-form ref="queryFormRef" :model="tableData.params" :inline="true" label-width="auto">
-        <el-form-item prop="username" label="操作人">
+        <el-form-item prop="username" :label="t('operationLog.operator')">
           <el-input
             v-model="tableData.params.username"
-            placeholder="操作人用户名"
+            :placeholder="t('operationLog.operatorPlaceholder')"
             clearable
             @keyup.enter="handleQuery"
           />
         </el-form-item>
 
-        <el-form-item prop="module" label="模块">
+        <el-form-item prop="module" :label="t('operationLog.module')">
           <el-input
             v-model="tableData.params.module"
-            placeholder="模块名称"
+            :placeholder="t('operationLog.modulePlaceholder')"
             clearable
             @keyup.enter="handleQuery"
           />
         </el-form-item>
 
-        <el-form-item prop="dateRange" label="操作时间">
+        <el-form-item prop="dateRange" :label="t('operationLog.operationTime')">
           <el-date-picker
             v-model="tableData.params.dateRange"
             :editable="false"
             type="daterange"
             range-separator="~"
-            start-placeholder="开始时间"
-            end-placeholder="截止时间"
+            :start-placeholder="t('operationLog.startTime')"
+            :end-placeholder="t('operationLog.endTime')"
             value-format="YYYY-MM-DD"
             style="width: 260px"
           />
         </el-form-item>
 
         <el-form-item>
-          <el-button type="primary" @click="handleQuery">搜索</el-button>
-          <el-button @click="handleResetQuery">重置</el-button>
+          <el-button type="primary" @click="handleQuery">{{ t('common.search') }}</el-button>
+          <el-button @click="handleResetQuery">{{ t('common.reset') }}</el-button>
         </el-form-item>
       </el-form>
     </el-card>
@@ -43,12 +43,12 @@
     <el-card ref="tableWrapperRef" class="page-content" shadow="never">
       <div class="page-toolbar">
         <div class="page-toolbar__right">
-          <el-tooltip content="刷新" placement="top">
+          <el-tooltip :content="t('common.refresh')" placement="top">
             <el-button class="page-icon-btn" @click="fetchData">
               <el-icon><Refresh /></el-icon>
             </el-button>
           </el-tooltip>
-          <el-tooltip content="全屏" placement="top">
+          <el-tooltip :content="t('common.fullscreen')" placement="top">
             <el-button class="page-icon-btn" @click="toggleFullscreen">
               <el-icon><FullScreen /></el-icon>
             </el-button>
@@ -58,31 +58,31 @@
 
       <div class="page-table-wrapper">
       <el-table v-loading="loading" class="page-table" :data="tableData.items" height="100%" highlight-current-row border>
-        <el-table-column label="模块" prop="module" width="120" show-overflow-tooltip />
-        <el-table-column label="操作" prop="action" width="120" show-overflow-tooltip />
-        <el-table-column label="描述" prop="description" min-width="180" show-overflow-tooltip />
-        <el-table-column label="状态" prop="success" width="80" align="center">
+        <el-table-column :label="t('operationLog.module')" prop="module" width="120" show-overflow-tooltip />
+        <el-table-column :label="t('operationLog.action')" prop="action" width="120" show-overflow-tooltip />
+        <el-table-column :label="t('operationLog.description')" prop="description" min-width="180" show-overflow-tooltip />
+        <el-table-column :label="t('operationLog.status')" prop="success" width="80" align="center">
           <template #default="{ row }">
             <el-tag :type="row.success ? 'success' : 'danger'" size="small">
-              {{ row.success ? "成功" : "失败" }}
+              {{ row.success ? t('operationLog.statusOptions.success') : t('operationLog.statusOptions.failure') }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="请求方法" prop="method" width="100" align="center">
+        <el-table-column :label="t('operationLog.method')" prop="method" width="100" align="center">
           <template #default="{ row }">
             <el-tag v-if="row.method" :type="getMethodTagType(row.method)" size="small" effect="plain">
               {{ row.method }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="请求路径" prop="path" min-width="180" show-overflow-tooltip />
-        <el-table-column label="耗时(ms)" prop="durationMs" width="100" align="center" />
-        <el-table-column label="操作人" prop="username" width="120" />
-        <el-table-column label="IP" prop="ip" width="140" />
-        <el-table-column label="操作时间" prop="createdAt" width="180" />
-        <el-table-column label="操作" width="80" align="center" fixed="right">
+        <el-table-column :label="t('operationLog.path')" prop="path" min-width="180" show-overflow-tooltip />
+        <el-table-column :label="t('operationLog.duration')" prop="durationMs" width="100" align="center" />
+        <el-table-column :label="t('operationLog.operator')" prop="username" width="120" />
+        <el-table-column :label="t('operationLog.ip')" prop="ip" width="140" />
+        <el-table-column :label="t('operationLog.operationTime')" prop="createdAt" width="180" />
+        <el-table-column :label="t('common.operation')" width="80" align="center" fixed="right">
           <template #default="{ row }">
-            <el-button type="primary" link size="small" @click="handleDetail(row)">详情</el-button>
+            <el-button type="primary" link size="small" @click="handleDetail(row)">{{ t('common.detail') }}</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -98,25 +98,25 @@
       />
     </el-card>
 
-    <el-dialog v-model="detailVisible" title="操作日志详情" width="720px">
+    <el-dialog v-model="detailVisible" :title="t('operationLog.detailTitle')" width="720px">
       <el-descriptions :column="2" border>
-        <el-descriptions-item label="模块">{{ detailData.module }}</el-descriptions-item>
-        <el-descriptions-item label="操作">{{ detailData.action }}</el-descriptions-item>
-        <el-descriptions-item label="描述" :span="2">{{ detailData.description }}</el-descriptions-item>
-        <el-descriptions-item label="状态">
+        <el-descriptions-item :label="t('operationLog.module')">{{ detailData.module }}</el-descriptions-item>
+        <el-descriptions-item :label="t('operationLog.action')">{{ detailData.action }}</el-descriptions-item>
+        <el-descriptions-item :label="t('operationLog.description')" :span="2">{{ detailData.description }}</el-descriptions-item>
+        <el-descriptions-item :label="t('operationLog.status')">
           <el-tag :type="detailData.success ? 'success' : 'danger'" size="small">
-            {{ detailData.success ? "成功" : "失败" }}
+            {{ detailData.success ? t('operationLog.statusOptions.success') : t('operationLog.statusOptions.failure') }}
           </el-tag>
         </el-descriptions-item>
-        <el-descriptions-item label="耗时">{{ detailData.durationMs }}ms</el-descriptions-item>
-        <el-descriptions-item label="操作人">{{ detailData.username }}</el-descriptions-item>
-        <el-descriptions-item label="操作时间">{{ detailData.createdAt }}</el-descriptions-item>
-        <el-descriptions-item label="IP">{{ detailData.ip }}</el-descriptions-item>
-        <el-descriptions-item label="请求方法">{{ detailData.method }}</el-descriptions-item>
-        <el-descriptions-item label="请求路径" :span="2">{{ detailData.path }}</el-descriptions-item>
-        <el-descriptions-item label="状态码">{{ detailData.statusCode }}</el-descriptions-item>
-        <el-descriptions-item label="请求ID">{{ detailData.requestId }}</el-descriptions-item>
-        <el-descriptions-item v-if="detailData.errorMessage" label="错误信息" :span="2">
+        <el-descriptions-item :label="t('operationLog.duration')">{{ detailData.durationMs }}ms</el-descriptions-item>
+        <el-descriptions-item :label="t('operationLog.operator')">{{ detailData.username }}</el-descriptions-item>
+        <el-descriptions-item :label="t('operationLog.operationTime')">{{ detailData.createdAt }}</el-descriptions-item>
+        <el-descriptions-item :label="t('operationLog.ip')">{{ detailData.ip }}</el-descriptions-item>
+        <el-descriptions-item :label="t('operationLog.method')">{{ detailData.method }}</el-descriptions-item>
+        <el-descriptions-item :label="t('operationLog.path')" :span="2">{{ detailData.path }}</el-descriptions-item>
+        <el-descriptions-item :label="t('operationLog.statusCode')">{{ detailData.statusCode }}</el-descriptions-item>
+        <el-descriptions-item :label="t('operationLog.requestId')">{{ detailData.requestId }}</el-descriptions-item>
+        <el-descriptions-item v-if="detailData.errorMessage" :label="t('operationLog.errorMessage')" :span="2">
           <span class="color-danger">{{ detailData.errorMessage }}</span>
         </el-descriptions-item>
       </el-descriptions>
@@ -130,11 +130,14 @@ defineOptions({
   inheritAttrs: false,
 });
 
+import { useI18n } from "vue-i18n";
 import { useFullscreen } from "@vueuse/core";
 import OperationLogAPI from "@/api/system/operation-log";
 import type { OperationLogItem, OperationLogQueryParams } from "@/api/system/operation-log";
 import type { PageResult } from "@/api/common";
 import type { FormInstance, TagProps } from "element-plus";
+
+const { t } = useI18n();
 
 function getMethodTagType(method: string): TagProps["type"] {
   const map: Record<string, TagProps["type"]> = {

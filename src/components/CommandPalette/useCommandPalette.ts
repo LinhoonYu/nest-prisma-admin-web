@@ -6,6 +6,7 @@ import { RouteRecordRaw, LocationQueryRaw } from "vue-router";
 import router from "@/router";
 import { usePermissionStore } from "@/stores";
 import { isExternal } from "@/utils";
+import { translateRouteTitle } from "@/lang/utils";
 
 /** 搜索项类型 */
 interface SearchItem {
@@ -159,7 +160,7 @@ export function useCommandPalette() {
         loadRoutes(route.children, path);
       } else if (route.meta?.title) {
         menuItems.value.push({
-          title: route.meta.title === "dashboard" ? "首页" : route.meta.title,
+          title: translateRouteTitle(route.meta.title, typeof route.name === "string" ? route.name : undefined),
           path,
           name: typeof route.name === "string" ? route.name : undefined,
           icon: route.meta.icon,

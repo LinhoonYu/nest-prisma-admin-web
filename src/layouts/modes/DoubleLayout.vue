@@ -17,18 +17,18 @@
             :key="item.path"
             class="layout-double__primary-item"
             :class="{ 'is-active': item.path === activeTopMenuPath }"
-            :title="item.meta?.title ? translateRouteTitle(item.meta.title) : undefined"
+            :title="item.meta?.title ? translateRouteTitle(item.meta.title, String(item.name || '')) : undefined"
             type="button"
             @click="handleTopMenuSelect(item.path)"
           >
             <LayoutMenuIcon :icon="item.meta?.icon" />
-            <span v-if="item.meta?.title">{{ translateRouteTitle(item.meta.title) }}</span>
+            <span v-if="item.meta?.title">{{ translateRouteTitle(item.meta.title, String(item.name || '')) }}</span>
           </button>
         </el-scrollbar>
 
         <button
           class="layout-double__primary-toggle"
-          :title="isSidebarOpen ? '收起菜单' : '展开菜单'"
+          :title="isSidebarOpen ? t('layout.collapseMenu') : t('layout.expandMenu')"
           type="button"
           @click="toggleSidebar"
         >
@@ -67,6 +67,7 @@
 </template>
 
 <script setup lang="ts">
+import { useI18n } from "vue-i18n";
 import { useLayout } from "../composables/useLayout";
 import { useMixMenu } from "../composables/useMixMenu";
 import { useAppStore } from "@/stores";
@@ -80,6 +81,7 @@ import LayoutMain from "../components/LayoutMain.vue";
 import LayoutSidebar from "../components/LayoutSidebar.vue";
 import LayoutMenuIcon from "../components/LayoutMenuIcon.vue";
 
+const { t } = useI18n();
 const appStore = useAppStore();
 const { showTagsView, showLogo, isSidebarOpen, toggleSidebar } = useLayout();
 

@@ -19,8 +19,8 @@
     <!-- 首次登录：选择创建或关联 -->
     <template v-else-if="state === 'pending'">
       <div class="oauth-pending">
-        <h2 class="oauth-pending__title">首次使用 {{ providerLabel }} 登录</h2>
-        <p class="oauth-pending__desc">请选择创建新账号或关联已有账号</p>
+        <h2 class="oauth-pending__title">{{ t("oauth.firstLoginTitle", { provider: providerLabel }) }}</h2>
+        <p class="oauth-pending__desc">{{ t("oauth.firstLoginDesc") }}</p>
 
         <div class="oauth-pending__options">
           <button
@@ -29,7 +29,7 @@
             @click="choice = 'register'"
           >
             <el-icon :size="20"><User /></el-icon>
-            <span>创建新账号</span>
+            <span>{{ t("oauth.createAccount") }}</span>
           </button>
           <button
             class="oauth-pending__option"
@@ -37,7 +37,7 @@
             @click="choice = 'link'"
           >
             <el-icon :size="20"><Link /></el-icon>
-            <span>关联已有账号</span>
+            <span>{{ t("oauth.linkExisting") }}</span>
           </button>
         </div>
 
@@ -53,7 +53,7 @@
           <el-form-item prop="username">
             <el-input
               v-model="linkForm.username"
-              placeholder="用户名"
+              :placeholder="t('login.username')"
               :prefix-icon="User"
             />
           </el-form-item>
@@ -61,7 +61,7 @@
             <el-input
               v-model="linkForm.password"
               type="password"
-              placeholder="密码"
+              :placeholder="t('login.password')"
               show-password
               :prefix-icon="Lock"
               @keyup.enter="handleLinkExisting"
@@ -77,10 +77,10 @@
           :disabled="choice === 'link' && !linkForm.username"
           @click="handleSubmit"
         >
-          {{ choice === 'register' ? '创建账号并登录' : '验证并关联' }}
+          {{ choice === 'register' ? t('oauth.createAndLogin') : t('oauth.verifyAndLink') }}
         </el-button>
 
-        <a class="oauth-pending__cancel" @click="goLogin">返回登录页</a>
+        <a class="oauth-pending__cancel" @click="goLogin">{{ t("oauth.backToLogin") }}</a>
       </div>
     </template>
   </div>
@@ -91,18 +91,20 @@ defineOptions({ name: "OAuthCallback", inheritAttrs: false });
 
 import { Loading, CircleClose, User, Link, Lock } from "@element-plus/icons-vue";
 import type { FormInstance, FormRules } from "element-plus";
+import { useI18n } from "vue-i18n";
 import AuthAPI from "@/api/auth";
 import type { OAuthProvider } from "@/api/auth";
 import { AuthStorage } from "@/utils/auth";
 import { rsaEncrypt } from "@/utils/rsa";
 import router from "@/router";
 
+const { t } = useI18n();
 const route = useRoute();
 
 type CallbackState = "loading" | "error" | "pending";
 
 const state = ref<CallbackState>("loading");
-const message = ref("正在完成登录...");
+const message = ref(t("oauth.processing"));
 const submitLoading = ref(false);
 const pendingCode = ref("");
 const provider = ref<OAuthProvider>("github");
@@ -113,8 +115,8 @@ const linkForm = reactive({ username: "", password: "" });
 const rsaPublicKey = ref<string>();
 
 const linkRules: FormRules = {
-  username: [{ required: true, message: "请输入用户名", trigger: "blur" }],
-  password: [{ required: true, message: "请输入密码", trigger: "blur" }],
+  username: [{ required: true, message: t("login.message.username.required"), trigger: "blur" }],
+  password: [{ required: true, message: t("login.message.password.required"), trigger: "blur" }],
 };
 
 const providerLabels: Record<OAuthProvider, string> = {
@@ -168,7 +170,7 @@ onMounted(async () => {
   }
 
   state.value = "error";
-  message.value = "参数缺失";
+  message.value = t("oauth.missingParams");
 });
 
 async function handleExchange(code: string) {
@@ -178,20 +180,20 @@ async function handleExchange(code: string) {
     await router.push("/");
   } catch {
     state.value = "error";
-    message.value = "登录失败，即将返回登录页";
+    message.value = t("oauth.loginFailed");
     await goLoginDelayed();
   }
 }
 
 async function handleBind(code: string, stateVal: string, prov: OAuthProvider) {
-  message.value = "正在绑定第三方账号...";
+  message.value = t("oauth.bindingProvider");
   try {
     await AuthAPI.bindOAuthIdentity({ provider: prov, code, state: stateVal });
-    ElMessage.success("绑定成功");
+    ElMessage.success(t("oauth.bindSuccess"));
     await router.push("/profile");
   } catch {
     state.value = "error";
-    message.value = "绑定失败，即将返回个人中心";
+    message.value = t("oauth.bindFailed");
     await new Promise((r) => setTimeout(r, 2000));
     await router.push("/profile");
   }
@@ -221,11 +223,11 @@ async function handleRegister() {
       pendingCode: pendingCode.value,
     });
     AuthStorage.setTokens(accessToken, refreshToken, false);
-    ElMessage.success("账号创建成功");
+    ElMessage.success(t("oauth.accountCreated"));
     await router.push("/");
   } catch {
     state.value = "error";
-    message.value = "创建账号失败，请重新登录";
+    message.value = t("oauth.createFailed");
     await goLoginDelayed();
   } finally {
     submitLoading.value = false;
@@ -249,7 +251,7 @@ async function handleLinkExisting() {
       password,
     });
     AuthStorage.setTokens(accessToken, refreshToken, false);
-    ElMessage.success("关联成功");
+    ElMessage.success(t("oauth.linkSuccess"));
     await router.push("/");
   } catch {
     // 拦截器已提示，表单留在原处让用户重试

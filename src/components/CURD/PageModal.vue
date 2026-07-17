@@ -59,8 +59,8 @@
         </el-form>
 
         <template #footer>
-          <el-button v-if="!formDisable" type="primary" @click="handleSubmit">确定</el-button>
-          <el-button @click="handleClose">关闭</el-button>
+          <el-button v-if="!formDisable" type="primary" @click="handleSubmit">{{ t('common.confirm') }}</el-button>
+          <el-button @click="handleClose">{{ t('common.close') }}</el-button>
         </template>
       </el-drawer>
     </template>
@@ -124,8 +124,8 @@
         </el-form>
 
         <template #footer>
-          <el-button v-if="!formDisable" type="primary" @click="handleSubmit">确定</el-button>
-          <el-button @click="handleClose">关闭</el-button>
+          <el-button v-if="!formDisable" type="primary" @click="handleSubmit">{{ t('common.confirm') }}</el-button>
+          <el-button @click="handleClose">{{ t('common.close') }}</el-button>
         </template>
       </el-dialog>
     </template>
@@ -133,12 +133,15 @@
 </template>
 
 <script setup lang="ts">
+import { useI18n } from "vue-i18n";
 import { useThrottleFn } from "@vueuse/core";
 import cloneDeep from "lodash-es/cloneDeep";
 import type { FormInstance, FormRules } from "element-plus";
 import type { IComponentType, IModalConfig, IObject } from "./types";
 import InputTag from "@/components/InputTag/index.vue";
 import IconSelect from "@/components/IconSelect/index.vue";
+
+const { t } = useI18n();
 
 defineSlots<{ [key: string]: (_args: any) => any }>();
 // 定义接收的属性
@@ -214,11 +217,10 @@ const handleSubmit = useThrottleFn(() => {
       return;
     }
     props.modalConfig.formAction(formData).then(() => {
-      if (props.modalConfig.component === "drawer") {
-        ElMessage.success(`${props.modalConfig.drawer?.title}成功`);
-      } else {
-        ElMessage.success(`${props.modalConfig.dialog?.title}成功`);
-      }
+      const title = props.modalConfig.component === "drawer"
+        ? props.modalConfig.drawer?.title
+        : props.modalConfig.dialog?.title;
+      ElMessage.success(t("common.operationSuccess", { name: title ?? "" }));
       emit("submitClick");
       handleClose();
     });

@@ -1,4 +1,5 @@
 import { ref, onMounted, onBeforeUnmount } from "vue";
+import { useI18n } from "vue-i18n";
 import NoticeAPI from "@/api/system/notice";
 import type { MyNoticeItem, MyNoticeDetail, MyNoticeQueryParams, NoticeWsPayload } from "@/api/system/notice";
 import { useSse } from "@/composables";
@@ -9,6 +10,7 @@ const NOTICE_EVENT = "notice";
 const NOTICE_REVOKE_EVENT = "notice-revoke";
 
 export function useNotice() {
+  const { t } = useI18n();
   const { on } = useSse();
 
   const list = ref<MyNoticeItem[]>([]);
@@ -16,7 +18,7 @@ export function useNotice() {
   const activeStatus = ref<0 | 1>(0);
   const detail = ref<MyNoticeDetail | null>(null);
   const dialogVisible = ref(false);
-  const emptyText = ref("暂无未读消息");
+  const emptyText = ref(t("notice.noUnread"));
 
   let unsubNotice: (() => void) | null = null;
   let unsubRevoke: (() => void) | null = null;
@@ -45,7 +47,7 @@ export function useNotice() {
     if (activeStatus.value === status) return;
 
     activeStatus.value = status;
-    emptyText.value = status === 0 ? "暂无未读消息" : "暂无已读消息";
+    emptyText.value = status === 0 ? t("notice.noUnread") : t("notice.noRead");
     await fetchList();
   }
 
@@ -80,7 +82,7 @@ export function useNotice() {
     } else {
       await fetchList();
     }
-    ElMessage.success("已全部标记为已读");
+    ElMessage.success(t("notice.allMarkedRead"));
   }
 
   function goMore() {
@@ -110,7 +112,7 @@ export function useNotice() {
       }
 
       ElNotification({
-        title: "您收到一条新的通知消息！",
+        title: t("notice.newNotice"),
         message: data.title,
         type: "success",
         position: "bottom-right",

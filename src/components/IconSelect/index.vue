@@ -4,7 +4,7 @@
       <template #reference>
         <div @click="popoverVisible = !popoverVisible">
           <slot>
-            <el-input v-model="selectedIcon" readonly placeholder="点击选择图标" class="reference">
+            <el-input v-model="selectedIcon" readonly :placeholder="t('iconSelect.placeholder')" class="reference">
               <template #prepend>
                 <!-- 根据图标类型展示 -->
                 <el-icon v-if="isElementIcon">
@@ -40,9 +40,9 @@
 
       <!-- 图标选择弹窗 -->
       <div ref="popoverContentRef">
-        <el-input v-model="filterText" placeholder="搜索图标" clearable @input="filterIcons" />
+        <el-input v-model="filterText" :placeholder="t('iconSelect.searchPlaceholder')" clearable @input="filterIcons" />
         <el-tabs v-model="activeTab" @tab-click="handleTabClick">
-          <el-tab-pane label="SVG 图标" name="svg">
+          <el-tab-pane :label="t('iconSelect.svgTab')" name="svg">
             <el-scrollbar height="300px">
               <ul class="icon-grid">
                 <li
@@ -58,7 +58,7 @@
               </ul>
             </el-scrollbar>
           </el-tab-pane>
-          <el-tab-pane label="Element 图标" name="element">
+          <el-tab-pane :label="t('iconSelect.elementTab')" name="element">
             <el-scrollbar height="300px">
               <ul class="icon-grid">
                 <li
@@ -81,7 +81,10 @@
 </template>
 
 <script setup lang="ts">
+import { useI18n } from "vue-i18n";
 import * as ElementPlusIconsVue from "@element-plus/icons-vue";
+
+const { t } = useI18n();
 
 const props = defineProps({
   modelValue: {
