@@ -137,6 +137,8 @@ export interface UserDetail {
   updatedAt: string;
   /** 角色 ID 列表 */
   roleIds: string[];
+  /** 自定义数据范围部门 ID 列表（dataScope=5 时有效） */
+  dataScopeDeptIds: string[];
 }
 
 /** 分配角色请求 */

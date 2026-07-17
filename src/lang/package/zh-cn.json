@@ -472,6 +472,15 @@
     "addUser": "新增用户",
     "editUser": "修改用户",
     "resetPassword": "重置密码",
+    "assignDataScope": "数据范围",
+    "dataScopeTitle": "设置数据范围",
+    "dataScopeOptions": {
+      "all": "全部",
+      "self": "本人",
+      "dept": "本部门",
+      "deptAndBelow": "本部门及以下",
+      "custom": "自定义"
+    },
     "genderOptions": {
       "unknown": "未知",
       "male": "男",
@@ -491,7 +500,9 @@
       "enterNewPassword": "请输入用户【{name}】的新密码",
       "passwordMinLength": "密码至少需要6位字符",
       "addSuccess": "新增用户成功",
-      "editSuccess": "修改用户成功"
+      "editSuccess": "修改用户成功",
+      "dataScopeSaved": "数据范围设置成功",
+      "selectCustomDept": "请选择自定义部门"
     }
   },
   "role": {

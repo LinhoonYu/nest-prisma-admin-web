@@ -470,6 +470,15 @@
     "addUser": "Add User",
     "editUser": "Edit User",
     "resetPassword": "Reset Password",
+    "assignDataScope": "Data Scope",
+    "dataScopeTitle": "Assign Data Scope",
+    "dataScopeOptions": {
+      "all": "All",
+      "self": "Self",
+      "dept": "Own Dept",
+      "deptAndBelow": "Own Dept & Below",
+      "custom": "Custom"
+    },
     "genderOptions": {
       "unknown": "Unknown",
       "male": "Male",
@@ -489,7 +498,9 @@
       "enterNewPassword": "Please enter the new password for user [{name}]",
       "passwordMinLength": "Password must be at least 6 characters",
       "addSuccess": "User added successfully",
-      "editSuccess": "User updated successfully"
+      "editSuccess": "User updated successfully",
+      "dataScopeSaved": "Data scope saved successfully",
+      "selectCustomDept": "Please select custom departments"
     }
   },
   "role": {

@@ -114,9 +114,25 @@
                 </el-tag>
               </template>
             </el-table-column>
-            <el-table-column :label="t('common.createTime')" align="center" prop="createdAt" width="180" />
-            <el-table-column :label="t('common.operation')" fixed="right" width="220">
+            <el-table-column :label="t('user.assignDataScope')" align="center" prop="dataScope" width="120">
               <template #default="scope">
+                <el-tag :type="dataScopeTagType(scope.row.dataScope)">
+                  {{ dataScopeLabel(scope.row.dataScope) }}
+                </el-tag>
+              </template>
+            </el-table-column>
+            <el-table-column :label="t('common.createTime')" align="center" prop="createdAt" width="180" />
+            <el-table-column :label="t('common.operation')" fixed="right" width="290">
+              <template #default="scope">
+                <el-button
+                  v-hasPerm="'iam:user:assign-scope'"
+                  type="primary"
+                  size="small"
+                  link
+                  @click="handleDataScopeClick(scope.row)"
+                >
+                  {{ t('user.assignDataScope') }}
+                </el-button>
                 <el-button
                   v-hasPerm="'iam:user:reset-password'"
                   type="primary"
@@ -246,6 +262,56 @@
         </div>
       </template>
     </el-drawer>
+
+    <!-- 数据范围设置抽屉 -->
+    <el-drawer
+      v-model="dataScopeState.visible"
+      :title="t('user.dataScopeTitle')"
+      append-to-body
+      :size="drawerSize"
+      @close="closeDataScopeDialog"
+    >
+      <el-form label-width="100px">
+        <el-form-item :label="t('user.assignDataScope')">
+          <el-radio-group v-model="dataScopeForm.dataScope">
+            <el-radio :value="1">{{ t('user.dataScopeOptions.all') }}</el-radio>
+            <el-radio :value="2">{{ t('user.dataScopeOptions.self') }}</el-radio>
+            <el-radio :value="3">{{ t('user.dataScopeOptions.dept') }}</el-radio>
+            <el-radio :value="4">{{ t('user.dataScopeOptions.deptAndBelow') }}</el-radio>
+            <el-radio :value="5">{{ t('user.dataScopeOptions.custom') }}</el-radio>
+          </el-radio-group>
+        </el-form-item>
+
+        <el-form-item v-if="dataScopeForm.dataScope === 5" :label="t('user.dept')">
+          <el-tree
+            ref="deptTreeRef"
+            node-key="value"
+            show-checkbox
+            :data="deptOptions"
+            :default-expand-all="true"
+            :check-strictly="false"
+            class="w-full"
+          >
+            <template #default="{ data }">
+              {{ data.label }}
+            </template>
+          </el-tree>
+        </el-form-item>
+      </el-form>
+
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button
+            v-hasPerm="'iam:user:assign-scope'"
+            type="primary"
+            @click="handleDataScopeSubmit"
+          >
+            {{ t('common.confirm') }}
+          </el-button>
+          <el-button @click="dataScopeState.visible = false">{{ t('common.cancel') }}</el-button>
+        </div>
+      </template>
+    </el-drawer>
   </div>
 </template>
 
@@ -255,7 +321,7 @@ import { useDebounceFn, useFullscreen } from "@vueuse/core";
 import { useI18n } from "vue-i18n";
 import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from "element-plus";
 import { ArrowLeft, ArrowRight } from "@element-plus/icons-vue";
-import type { UserForm, UserItem, UserDetail } from "@/api/system/user";
+import type { UserForm, UserItem, UserDetail, AssignDataScopeRequest } from "@/api/system/user";
 import UserAPI from "@/api/system/user";
 import DeptAPI from "@/api/system/dept";
 import type { DeptItem } from "@/api/system/dept";
@@ -283,6 +349,7 @@ const { toggle: toggleFullscreen } = useFullscreen(tableWrapperRef);
 // 表单引用
 const queryFormRef = ref<FormInstance>();
 const userFormRef = ref<FormInstance>();
+const deptTreeRef = ref();
 
 const loading = ref(false);
 const sidebarCollapsed = ref(false);
@@ -334,6 +401,40 @@ const selectedRoleIds = ref<string[]>([]);
 // 下拉选项
 const deptOptions = ref<OptionItem[]>();
 const roleOptions = ref<OptionItem[]>();
+
+// 数据范围弹窗
+const dataScopeState = reactive({
+  visible: false,
+  userId: "" as string,
+});
+
+const dataScopeForm = reactive({
+  dataScope: 1,
+});
+
+const DATA_SCOPE_LABELS: Record<number, string> = {
+  1: "user.dataScopeOptions.all",
+  2: "user.dataScopeOptions.self",
+  3: "user.dataScopeOptions.dept",
+  4: "user.dataScopeOptions.deptAndBelow",
+  5: "user.dataScopeOptions.custom",
+};
+
+const DATA_SCOPE_TAG_TYPES: Record<number, "primary" | "success" | "warning" | "info" | "danger"> = {
+  1: "danger",
+  2: "info",
+  3: "warning",
+  4: "success",
+  5: "primary",
+};
+
+function dataScopeLabel(scope: number): string {
+  return t(DATA_SCOPE_LABELS[scope] ?? "user.dataScopeOptions.self");
+}
+
+function dataScopeTagType(scope: number): "primary" | "success" | "warning" | "info" | "danger" {
+  return DATA_SCOPE_TAG_TYPES[scope] ?? "info";
+}
 
 const drawerSize = computed(() => (appStore.device === DeviceEnum.DESKTOP ? "600px" : "90%"));
 
@@ -547,6 +648,68 @@ function handleDelete(id?: string): void {
       /* 用户取消 */
     }
   );
+}
+
+/**
+ * 打开数据范围设置抽屉
+ */
+async function handleDataScopeClick(row: UserItem): Promise<void> {
+  dataScopeState.userId = row.id;
+  dataScopeForm.dataScope = row.dataScope;
+
+  loading.value = true;
+  const [detail, deptTree] = await Promise.all([
+    UserAPI.getDetail(row.id),
+    DeptAPI.getList(),
+  ]);
+  deptOptions.value = transformDeptOptions(deptTree);
+  loading.value = false;
+
+  dataScopeState.visible = true;
+
+  if (dataScopeForm.dataScope === 5 && detail.dataScopeDeptIds?.length) {
+    nextTick(() => {
+      deptTreeRef.value?.setCheckedKeys(detail.dataScopeDeptIds);
+    });
+  }
+}
+
+/**
+ * 提交数据范围设置
+ */
+const handleDataScopeSubmit = useDebounceFn(async () => {
+  const deptIds =
+    dataScopeForm.dataScope === 5
+      ? (deptTreeRef.value?.getCheckedKeys() ?? []).map(String)
+      : [];
+
+  if (dataScopeForm.dataScope === 5 && deptIds.length === 0) {
+    ElMessage.warning(t("user.messages.selectCustomDept"));
+    return;
+  }
+
+  loading.value = true;
+  try {
+    const payload: AssignDataScopeRequest = {
+      dataScope: dataScopeForm.dataScope,
+      deptIds,
+    };
+    await UserAPI.assignDataScope(dataScopeState.userId, payload);
+    ElMessage.success(t("user.messages.dataScopeSaved"));
+    dataScopeState.visible = false;
+    handleQuery();
+  } finally {
+    loading.value = false;
+  }
+}, 300);
+
+/**
+ * 关闭数据范围抽屉并重置状态
+ */
+function closeDataScopeDialog(): void {
+  dataScopeForm.dataScope = 1;
+  dataScopeState.userId = "";
+  deptTreeRef.value?.setCheckedKeys([]);
 }
 
 onMounted(() => {
