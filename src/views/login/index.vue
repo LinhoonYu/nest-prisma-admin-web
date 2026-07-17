@@ -204,7 +204,7 @@ const UserIcon = markRaw(User);
 const LockIcon = markRaw(Lock);
 
 const loginFormData = ref<LoginRequest>({
-  username: "admin",
+  username: "demo",
   password: "123456",
   captchaKey: "",
   captchaCode: "",
