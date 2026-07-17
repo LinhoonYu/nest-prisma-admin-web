@@ -29,7 +29,7 @@
       <div class="page-toolbar">
         <div class="page-toolbar__left">
           <el-button
-            v-hasPerm="['sys:menu:create']"
+            v-hasPerm="['iam:menu:create']"
             type="primary"
             @click="openDialog()"
           >
@@ -114,7 +114,7 @@
           <template #default="scope">
             <el-button
               v-if="scope.row.type === MenuTypeEnum.CATALOG || scope.row.type === MenuTypeEnum.MENU"
-              v-hasPerm="['sys:menu:create']"
+              v-hasPerm="['iam:menu:create']"
               type="primary"
               link
               size="small"
@@ -124,7 +124,7 @@
             </el-button>
 
             <el-button
-              v-hasPerm="['sys:menu:update']"
+              v-hasPerm="['iam:menu:update']"
               type="primary"
               link
               size="small"
@@ -133,7 +133,7 @@
               编辑
             </el-button>
             <el-button
-              v-hasPerm="['sys:menu:delete']"
+              v-hasPerm="['iam:menu:delete']"
               type="danger"
               link
               size="small"

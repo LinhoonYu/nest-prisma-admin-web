@@ -80,7 +80,7 @@
         <el-table-column fixed="right" label="操作" width="320">
           <template #default="scope">
             <el-button
-              v-hasPerm="'sys:role:assign'"
+              v-hasPerm="'iam:role:assign-menus'"
               type="primary"
               size="small"
               link
@@ -89,7 +89,7 @@
               分配菜单
             </el-button>
             <el-button
-              v-hasPerm="'sys:role:assign'"
+              v-hasPerm="'iam:role:assign-perms'"
               type="primary"
               size="small"
               link
@@ -228,7 +228,7 @@
 
       <template #footer>
         <div class="dialog-footer">
-          <el-button v-hasPerm="'sys:role:assign'" type="primary" @click="handleAssignMenuSubmit">
+          <el-button v-hasPerm="'iam:role:assign-menus'" type="primary" @click="handleAssignMenuSubmit">
             确定
           </el-button>
           <el-button @click="assignMenuDialogVisible = false">取消</el-button>
@@ -283,7 +283,7 @@
 
       <template #footer>
         <div class="dialog-footer">
-          <el-button v-hasPerm="'sys:role:assign'" type="primary" @click="handleAssignPermSubmit">
+          <el-button v-hasPerm="'iam:role:assign-perms'" type="primary" @click="handleAssignPermSubmit">
             确定
           </el-button>
           <el-button @click="assignPermDialogVisible = false">取消</el-button>

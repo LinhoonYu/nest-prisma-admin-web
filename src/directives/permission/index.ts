@@ -12,7 +12,7 @@ export const hasPerm: Directive = {
     // 校验传入的权限值是否合法
     if (!requiredPerms || (typeof requiredPerms !== "string" && !Array.isArray(requiredPerms))) {
       throw new Error(
-        "需要提供权限标识！例如：v-has-perm=\"'sys:user:create'\" 或 v-has-perm=\"['sys:user:create', 'sys:user:update']\""
+        "需要提供权限标识！例如：v-has-perm=\"'iam:user:create'\" 或 v-has-perm=\"['iam:user:create', 'iam:user:update']\""
       );
     }
 

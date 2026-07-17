@@ -1,7 +1,7 @@
 {
   "name": "nest-prisma-admin-web",
   "description": "基于 Vue 3 + Vite + TypeScript + Element Plus 构建的企业级后台管理系统前端，对接 nest-prisma-admin 后端。",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "private": true,
   "type": "module",
   "scripts": {

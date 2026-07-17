@@ -60,14 +60,14 @@
           <div class="page-toolbar">
             <div class="page-toolbar__left">
               <el-button
-                v-hasPerm="'sys:user:create'"
+                v-hasPerm="'iam:user:create'"
                 type="primary"
                 @click="handleCreateClick"
               >
                 新增
               </el-button>
               <el-button
-                v-hasPerm="'sys:user:delete'"
+                v-hasPerm="'iam:user:delete'"
                 type="danger"
                 :disabled="!hasSelection"
                 @click="handleDelete()"
@@ -118,7 +118,7 @@
             <el-table-column label="操作" fixed="right" width="220">
               <template #default="scope">
                 <el-button
-                  v-hasPerm="'sys:user:reset-password'"
+                  v-hasPerm="'iam:user:reset-password'"
                   type="primary"
                   size="small"
                   link
@@ -127,7 +127,7 @@
                   重置密码
                 </el-button>
                 <el-button
-                  v-hasPerm="'sys:user:update'"
+                  v-hasPerm="'iam:user:update'"
                   type="primary"
                   link
                   size="small"
@@ -136,7 +136,7 @@
                   编辑
                 </el-button>
                 <el-button
-                  v-hasPerm="'sys:user:delete'"
+                  v-hasPerm="'iam:user:delete'"
                   type="danger"
                   link
                   size="small"

@@ -30,14 +30,14 @@
       <div class="page-toolbar">
         <div class="page-toolbar__left">
           <el-button
-            v-hasPerm="['sys:dept:create']"
+            v-hasPerm="['iam:dept:create']"
             type="primary"
             @click="openDialog()"
           >
             新增
           </el-button>
           <el-button
-            v-hasPerm="['sys:dept:delete']"
+            v-hasPerm="['iam:dept:delete']"
             type="danger"
             :disabled="selectIds.length === 0"
             @click="handleDelete()"
@@ -86,7 +86,7 @@
         <el-table-column label="操作" fixed="right" align="left" width="200">
           <template #default="scope">
             <el-button
-              v-hasPerm="['sys:dept:create']"
+              v-hasPerm="['iam:dept:create']"
               type="primary"
               link
               size="small"
@@ -95,7 +95,7 @@
               新增
             </el-button>
             <el-button
-              v-hasPerm="['sys:dept:update']"
+              v-hasPerm="['iam:dept:update']"
               type="primary"
               link
               size="small"
@@ -104,7 +104,7 @@
               编辑
             </el-button>
             <el-button
-              v-hasPerm="['sys:dept:delete']"
+              v-hasPerm="['iam:dept:delete']"
               type="danger"
               link
               size="small"
