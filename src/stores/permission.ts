@@ -3,6 +3,7 @@ import { constantRoutes } from "@/router";
 import { store } from "@/stores";
 import router from "@/router";
 import { useUserStoreHook } from "@/stores/user";
+import { isExternal } from "@/utils";
 
 import MenuAPI from "@/api/system/menu";
 import type { MenuItem, RouteItem } from "@/api/system/menu";
@@ -24,21 +25,104 @@ function resolveViewComponent(componentPath: string) {
 }
 
 /**
+ * 规范化路由路径：顶级路由不以 / 开头时自动补全
+ */
+function normalizePath(path: string, isTopLevel: boolean): string {
+  if (!path || isExternal(path)) return path;
+  if (isTopLevel && !path.startsWith("/")) {
+    return `/${path}`;
+  }
+  return path;
+}
+
+/**
+ * 过滤掉外链路由，递归清理 children
+ *
+ * 外链路由只用于侧边栏展示（AppLink 渲染为 <a>），不注册到 vue-router。
+ * 过滤后若目录的 children 全部是外链（变空），则该目录也不注册。
+ */
+function filterExternalRoutes(routes: RouteRecordRaw[]): RouteRecordRaw[] {
+  return routes
+    .filter((route) => !isExternal(route.path))
+    .map((route) => {
+      if (!route.children?.length) return route;
+      const filteredChildren = filterExternalRoutes(route.children);
+      return { ...route, children: filteredChildren };
+    });
+}
+
+/**
  * 将后端菜单树节点转换为前端路由项
  */
 function transformMenuToRoute(menu: MenuItem, isTopLevel: boolean): RouteItem | null {
-  // 只处理目录和菜单类型（1=目录 2=菜单），链接和 iframe 暂不生成路由
-  if (menu.type !== MenuType.DIRECTORY && menu.type !== MenuType.MENU) {
-    return null;
-  }
-
   // 禁用的菜单不生成路由
   if (menu.status === 0) {
     return null;
   }
 
+  // 外链类型：path 放 externalUrl，侧边栏 AppLink 会渲染为 <a target="_blank">
+  if (menu.type === MenuType.LINK) {
+    if (!menu.externalUrl) return null;
+    return {
+      path: menu.externalUrl,
+      name: menu.name,
+      component: undefined,
+      meta: {
+        title: menu.title,
+        icon: menu.icon ?? undefined,
+        hidden: menu.hidden === 1,
+      },
+      children: [],
+    };
+  }
+
+  // 内嵌类型：系统内 iframe 展示外部页面
+  if (menu.type === MenuType.IFRAME) {
+    if (!menu.externalUrl) return null;
+    const iframeMeta = {
+      title: menu.title,
+      icon: menu.icon ?? undefined,
+      hidden: menu.hidden === 1,
+      keepAlive: menu.keepAlive === 1,
+      alwaysShow: menu.alwaysShow === 1,
+      externalUrl: menu.externalUrl,
+    };
+
+    // 顶级 IFRAME 自动包 Layout，保证侧边栏和导航栏正常显示
+    if (isTopLevel) {
+      return {
+        path: normalizePath(menu.path ?? "", isTopLevel),
+        name: menu.name,
+        component: "Layout",
+        meta: iframeMeta,
+        children: [
+          {
+            path: "",
+            name: `${menu.name}Inner`,
+            component: "iframe/index",
+            meta: iframeMeta,
+            children: [],
+          },
+        ],
+      };
+    }
+
+    return {
+      path: normalizePath(menu.path ?? "", isTopLevel),
+      name: menu.name,
+      component: "iframe/index",
+      meta: iframeMeta,
+      children: [],
+    };
+  }
+
+  // 目录和菜单类型
+  if (menu.type !== MenuType.DIRECTORY && menu.type !== MenuType.MENU) {
+    return null;
+  }
+
   const route: RouteItem = {
-    path: menu.path ?? "",
+    path: normalizePath(menu.path ?? "", isTopLevel),
     name: menu.name,
     component: undefined,
     meta: {
@@ -123,10 +207,12 @@ export const usePermissionStore = defineStore("permission", () => {
 
       const dynamicRoutes = transformRouteItems(routeItems, true);
 
+      // routes.value 保留完整路由（含外链），供侧边栏渲染
       routes.value = [...constantRoutes, ...dynamicRoutes];
       isRouteGenerated.value = true;
 
-      return dynamicRoutes;
+      // 返回过滤掉外链的版本，外链不注册到 vue-router
+      return filterExternalRoutes(dynamicRoutes);
     } catch (error) {
       isRouteGenerated.value = false;
       throw error;

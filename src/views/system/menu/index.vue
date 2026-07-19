@@ -393,15 +393,23 @@ const isExternalLink = computed(
 );
 
 const needsRouteName = computed(
-  () => formData.type === MenuTypeEnum.MENU || formData.type === MenuTypeEnum.CATALOG
+  () =>
+    formData.type === MenuTypeEnum.MENU ||
+    formData.type === MenuTypeEnum.CATALOG ||
+    formData.type === MenuTypeEnum.IFRAME ||
+    formData.type === MenuTypeEnum.LINK
 );
 
 const needsPath = computed(
-  () => formData.type === MenuTypeEnum.MENU || formData.type === MenuTypeEnum.CATALOG
+  () => formData.type === MenuTypeEnum.MENU || formData.type === MenuTypeEnum.CATALOG || formData.type === MenuTypeEnum.IFRAME
 );
 
 const needsVisibility = computed(
-  () => formData.type === MenuTypeEnum.MENU || formData.type === MenuTypeEnum.CATALOG
+  () =>
+    formData.type === MenuTypeEnum.MENU ||
+    formData.type === MenuTypeEnum.CATALOG ||
+    formData.type === MenuTypeEnum.IFRAME ||
+    formData.type === MenuTypeEnum.LINK
 );
 
 const rules = computed<FormRules>(() => ({

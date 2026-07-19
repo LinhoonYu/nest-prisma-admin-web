@@ -136,4 +136,6 @@ export interface Meta {
   roles?: string[];
   /** 路由标题 */
   title?: string;
+  /** 外链 URL（IFRAME 内嵌用） */
+  externalUrl?: string;
 }
