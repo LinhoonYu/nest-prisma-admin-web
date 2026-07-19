@@ -73,6 +73,12 @@ export const enum ApiCodeEnum {
   /** 系统数据不可修改 */
   SYSTEM_DATA_CODE_IMMUTABLE = 1014,
 
+  /** 演示账号受保护 */
+  PROTECTED_USER = 1015,
+
+  /** 系统内置数据不可删除 */
+  SYSTEM_DATA_CANNOT_DELETE = 1016,
+
   // ===== 权限相关 2xxx =====
   /** 权限不足 */
   PERMISSION_DENIED = 2001,

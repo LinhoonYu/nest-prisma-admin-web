@@ -649,6 +649,11 @@
     "addNotice": "Add Notice",
     "editNotice": "Edit Notice",
     "noticeDetail": "Notice Detail",
+    "actions": {
+      "publish": "Publish",
+      "revoke": "Revoke",
+      "retry": "Retry"
+    },
     "targetTypeOptions": {
       "all": "All",
       "specified": "Specified Users"

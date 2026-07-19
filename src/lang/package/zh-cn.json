@@ -651,6 +651,11 @@
     "addNotice": "新增通知",
     "editNotice": "修改通知",
     "noticeDetail": "通知详情",
+    "actions": {
+      "publish": "发布",
+      "revoke": "撤回",
+      "retry": "重试"
+    },
     "targetTypeOptions": {
       "all": "全体",
       "specified": "指定用户"

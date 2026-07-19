@@ -1,4 +1,4 @@
-﻿﻿﻿<template>
+﻿﻿﻿﻿﻿<template>
   <div class="page-container">
     <el-card class="page-search" shadow="never">
       <el-form ref="queryFormRef" :model="tableData.params" :inline="true" label-suffix=":">
@@ -164,7 +164,7 @@
               link
               @click="handlePublish(scope.row.id)"
             >
-              {{ t('notice.publishStatusOptions.published') }}
+              {{ t('notice.actions.publish') }}
             </el-button>
             <el-button
               v-if="scope.row.publishStatus === 1 || scope.row.publishStatus === 2"
@@ -174,7 +174,7 @@
               link
               @click="handleRevoke(scope.row.id)"
             >
-              {{ t('notice.publishStatusOptions.revoked') }}
+              {{ t('notice.actions.revoke') }}
             </el-button>
             <el-button
               v-if="scope.row.sendStatus === -1"
@@ -184,7 +184,7 @@
               link
               @click="handleRetry(scope.row.id)"
             >
-              {{ t('common.refresh') }}
+              {{ t('notice.actions.retry') }}
             </el-button>
             <el-button
               v-if="scope.row.publishStatus === 0"
