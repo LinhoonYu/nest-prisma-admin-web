@@ -7,10 +7,13 @@ const FILE_BASE_URL = "/api/v1/files";
  * 拼接文件代理访问 URL（永久有效，可被浏览器缓存）
  *
  * 用于 <img :src> 等需要永久 URL 的场景（头像、富文本图片等）
+ * 需要带上 API 前缀，因为这些 URL 不走 axios，浏览器直接请求
  */
-export function fileProxyUrl(fileId: string | number | null | undefined): string {
+export function fileProxyUrl(
+  fileId: string | number | null | undefined,
+): string {
   if (!fileId) return "";
-  return `${FILE_BASE_URL}/proxy/${fileId}`;
+  return `${import.meta.env.VITE_APP_BASE_API}${FILE_BASE_URL}/proxy/${fileId}`;
 }
 
 const FileAPI = {
