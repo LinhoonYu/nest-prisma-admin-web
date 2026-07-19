@@ -2,6 +2,33 @@
  * 数据格式化相关工具函数
  */
 
+import { dayjs } from "element-plus";
+
+/**
+ * 格式化日期时间
+ *
+ * 后端返回 ISO 8601 字符串（如 "2026-07-17T12:23:50.831Z"），
+ * 该函数将其转为本地时区的可读格式。
+ *
+ * @param value 日期值（ISO 字符串、Date 对象、时间戳）
+ * @param format 格式模板，默认 "YYYY-MM-DD HH:mm:ss"
+ * @returns 格式化后的字符串，空值返回 "-"
+ *
+ * @example
+ * ```ts
+ * formatDateTime("2026-07-17T12:23:50.831Z");  // "2026-07-17 20:23:50"（UTC+8）
+ * formatDateTime(null);                         // "-"
+ * formatDateTime("2026-07-17T12:23:50.831Z", "YYYY-MM-DD");  // "2026-07-17"
+ * ```
+ */
+export function formatDateTime(
+  value: string | Date | number | null | undefined,
+  format: string = "YYYY-MM-DD HH:mm:ss",
+): string {
+  if (!value) return "-";
+  return dayjs(value).format(format);
+}
+
 /**
  * 格式化增长率
  * 保留两位小数，去掉末尾的 0，取绝对值

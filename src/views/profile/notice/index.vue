@@ -54,7 +54,9 @@
             :label="t('myNotice.publishTime')"
             prop="publishTime"
             width="180"
-          />
+          >
+            <template #default="{ row }">{{ formatDateTime(row.publishTime) }}</template>
+          </el-table-column>
           <el-table-column align="center" :label="t('common.status')" width="100">
             <template #default="scope">
               <el-tag v-if="scope.row.isRead === 1" type="success">{{ t('myNotice.read') }}</el-tag>
@@ -90,7 +92,7 @@
         <div class="notice-detail__meta">
           <span>
             <el-icon><Timer /></el-icon>
-            {{ noticeDetail.publishTime || "-" }}
+            {{ formatDateTime(noticeDetail.publishTime) }}
           </span>
         </div>
 
@@ -110,6 +112,7 @@ import { Refresh, Search, Timer, User } from "@element-plus/icons-vue";
 import NoticeAPI from "@/api/system/notice";
 import type { MyNoticeItem, MyNoticeDetail, MyNoticeQueryParams } from "@/api/system/notice";
 import { usePageTable } from "@/composables";
+import { formatDateTime } from "@/utils/format";
 
 defineOptions({
   name: "MyNotice",

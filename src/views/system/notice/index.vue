@@ -135,19 +135,19 @@
           <template #default="scope">
             <div class="flex-x-start">
               <span>{{ t('notice.timeLabels.created') }}：</span>
-              <span>{{ scope.row.createdAt || "-" }}</span>
+              <span>{{ formatDateTime(scope.row.createdAt) }}</span>
             </div>
             <div v-if="scope.row.sendMode === 2 && scope.row.sendTime" class="flex-x-start">
               <span>{{ t('notice.timeLabels.scheduled') }}：</span>
-              <span>{{ scope.row.sendTime }}</span>
+              <span>{{ formatDateTime(scope.row.sendTime) }}</span>
             </div>
             <div v-if="scope.row.publishStatus === 1" class="flex-x-start">
               <span>{{ t('notice.timeLabels.published') }}：</span>
-              <span>{{ scope.row.publishTime || "-" }}</span>
+              <span>{{ formatDateTime(scope.row.publishTime) }}</span>
             </div>
             <div v-else-if="scope.row.publishStatus === -1" class="flex-x-start">
               <span>{{ t('notice.timeLabels.revoked') }}：</span>
-              <span>{{ scope.row.revokeTime || "-" }}</span>
+              <span>{{ formatDateTime(scope.row.revokeTime) }}</span>
             </div>
           </template>
         </el-table-column>
@@ -345,7 +345,7 @@
           {{ currentNotice?.sendMode === 2 ? t('notice.sendModeOptions.scheduled') : t('notice.sendModeOptions.instant') }}
         </el-descriptions-item>
         <el-descriptions-item v-if="currentNotice?.sendMode === 2" :label="t('notice.timeLabels.scheduled') + '：'">
-          {{ currentNotice?.sendTime || "-" }}
+          {{ formatDateTime(currentNotice?.sendTime) }}
         </el-descriptions-item>
         <el-descriptions-item :label="t('notice.sendStatus') + '：'">
           <el-tag v-if="currentNotice?.sendStatus === 0" type="info">{{ t('notice.sendStatusOptions.pending') }}</el-tag>
@@ -357,7 +357,7 @@
           {{ currentNotice.expireDays }} {{ t('notice.dayUnit') }}
         </el-descriptions-item>
         <el-descriptions-item v-if="currentNotice?.publishTime" :label="t('notice.timeLabels.published') + '：'">
-          {{ currentNotice.publishTime }}
+          {{ formatDateTime(currentNotice.publishTime) }}
         </el-descriptions-item>
         <el-descriptions-item :label="t('notice.content') + '：'">
           <div class="notice-content" v-html="currentNotice?.content" />
@@ -380,6 +380,7 @@ import type {
 import UserAPI from "@/api/system/user";
 import type { OptionItem } from "@/api/common";
 import type { FormInstance, FormRules } from "element-plus";
+import { formatDateTime } from "@/utils/format";
 
 const { t } = useI18n();
 

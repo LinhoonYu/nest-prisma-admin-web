@@ -89,7 +89,9 @@
             <span v-else class="color-text-placeholder">—</span>
           </template>
         </el-table-column>
-        <el-table-column :label="t('loginLog.loginTime')" prop="createdAt" width="180" />
+        <el-table-column :label="t('loginLog.loginTime')" prop="createdAt" width="180">
+          <template #default="{ row }">{{ formatDateTime(row.createdAt) }}</template>
+        </el-table-column>
         <el-table-column :label="t('common.operation')" width="80" align="center" fixed="right">
           <template #default="{ row }">
             <el-button type="primary" link size="small" @click="handleDetail(row)">{{ t('common.detail') }}</el-button>
@@ -117,7 +119,7 @@
             {{ detailData.status === 1 ? t('loginLog.statusOptions.success') : t('loginLog.statusOptions.failure') }}
           </el-tag>
         </el-descriptions-item>
-        <el-descriptions-item :label="t('loginLog.loginTime')">{{ detailData.createdAt }}</el-descriptions-item>
+        <el-descriptions-item :label="t('loginLog.loginTime')">{{ formatDateTime(detailData.createdAt) }}</el-descriptions-item>
         <el-descriptions-item :label="t('loginLog.ipAddress')">{{ detailData.ip }}</el-descriptions-item>
         <el-descriptions-item :label="t('loginLog.location')">{{ detailData.location }}</el-descriptions-item>
         <el-descriptions-item :label="t('loginLog.browser')">{{ detailData.browser }}</el-descriptions-item>
@@ -147,6 +149,7 @@ import LoginLogAPI from "@/api/system/login-log";
 import type { LoginLogItem, LoginLogQueryParams } from "@/api/system/login-log";
 import type { PageResult } from "@/api/common";
 import type { FormInstance } from "element-plus";
+import { formatDateTime } from "@/utils/format";
 
 const { t } = useI18n();
 

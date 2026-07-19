@@ -38,7 +38,7 @@
           <div class="profile-hero__meta">
             <span class="profile-hero__meta-item">
               <el-icon><Calendar /></el-icon>
-              {{ t('profile.joinedAt') }} {{ formatValue(userProfile.createTime) }}
+              {{ t('profile.joinedAt') }} {{ formatDateTime(userProfile.createTime) }}
             </span>
           </div>
         </div>
@@ -290,6 +290,7 @@ import FileAPI from "@/api/file";
 import { fileProxyUrl } from "@/api/file";
 import { useUserStoreHook } from "@/stores";
 import { redirectToLogin } from "@/utils/auth";
+import { formatDateTime } from "@/utils/format";
 import UserAvatar from "@/components/UserAvatar/index.vue";
 
 import {
@@ -479,7 +480,7 @@ const profileInfoItems = computed<ProfileInfoItem[]>(() => [
   },
   {
     label: t("profile.createTime"),
-    value: formatValue(userProfile.value.createTime),
+    value: formatDateTime(userProfile.value.createTime),
     icon: Timer,
     muted: !userProfile.value.createTime,
   },
@@ -615,10 +616,6 @@ const securityItems = computed<SecurityItem[]>(() => [
         ],
   },
 ]);
-
-function formatValue(value?: string) {
-  return value || "-";
-}
 
 function maskMobile(mobile?: string) {
   if (!mobile) return "";

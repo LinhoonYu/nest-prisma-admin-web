@@ -121,7 +121,9 @@
                 </el-tag>
               </template>
             </el-table-column>
-            <el-table-column :label="t('common.createTime')" align="center" prop="createdAt" width="180" />
+            <el-table-column :label="t('common.createTime')" align="center" prop="createdAt" width="180">
+              <template #default="{ row }">{{ formatDateTime(row.createdAt) }}</template>
+            </el-table-column>
             <el-table-column :label="t('common.operation')" fixed="right" width="290">
               <template #default="scope">
                 <el-button
@@ -332,6 +334,7 @@ import { useUserStore, useAppStore } from "@/stores";
 import { DeviceEnum, DialogMode, CommonStatus } from "@/enums";
 import { useTableSelection } from "@/composables";
 import UserDeptTree from "./components/UserDeptTree.vue";
+import { formatDateTime } from "@/utils/format";
 
 const { t } = useI18n();
 

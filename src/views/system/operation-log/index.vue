@@ -79,7 +79,9 @@
         <el-table-column :label="t('operationLog.duration')" prop="durationMs" width="100" align="center" />
         <el-table-column :label="t('operationLog.operator')" prop="username" width="120" />
         <el-table-column :label="t('operationLog.ip')" prop="ip" width="140" />
-        <el-table-column :label="t('operationLog.operationTime')" prop="createdAt" width="180" />
+        <el-table-column :label="t('operationLog.operationTime')" prop="createdAt" width="180">
+          <template #default="{ row }">{{ formatDateTime(row.createdAt) }}</template>
+        </el-table-column>
         <el-table-column :label="t('common.operation')" width="80" align="center" fixed="right">
           <template #default="{ row }">
             <el-button type="primary" link size="small" @click="handleDetail(row)">{{ t('common.detail') }}</el-button>
@@ -110,7 +112,7 @@
         </el-descriptions-item>
         <el-descriptions-item :label="t('operationLog.duration')">{{ detailData.durationMs }}ms</el-descriptions-item>
         <el-descriptions-item :label="t('operationLog.operator')">{{ detailData.username }}</el-descriptions-item>
-        <el-descriptions-item :label="t('operationLog.operationTime')">{{ detailData.createdAt }}</el-descriptions-item>
+        <el-descriptions-item :label="t('operationLog.operationTime')">{{ formatDateTime(detailData.createdAt) }}</el-descriptions-item>
         <el-descriptions-item :label="t('operationLog.ip')">{{ detailData.ip }}</el-descriptions-item>
         <el-descriptions-item :label="t('operationLog.method')">{{ detailData.method }}</el-descriptions-item>
         <el-descriptions-item :label="t('operationLog.path')" :span="2">{{ detailData.path }}</el-descriptions-item>
@@ -136,6 +138,7 @@ import OperationLogAPI from "@/api/system/operation-log";
 import type { OperationLogItem, OperationLogQueryParams } from "@/api/system/operation-log";
 import type { PageResult } from "@/api/common";
 import type { FormInstance, TagProps } from "element-plus";
+import { formatDateTime } from "@/utils/format";
 
 const { t } = useI18n();
 
