@@ -166,8 +166,21 @@
           />
         </el-form-item>
 
-        <el-form-item :label="t('menu.displayTitle')" prop="title">
-          <el-input v-model="formData.title" :placeholder="t('menu.messages.enterTitle')" />
+        <el-form-item :label="t('menu.displayTitle')" prop="titles">
+          <div class="flex flex-col gap-2 w-full">
+            <div
+              v-for="lang in supportedLanguages"
+              :key="lang.value"
+              class="flex items-center gap-2"
+            >
+              <span class="text-gray-400 shrink-0 w-[72px]">{{ lang.label }}：</span>
+              <el-input
+                v-model="formData.titles[lang.value]"
+                :placeholder="`${lang.label}标题`"
+                class="flex-1 min-w-0"
+              />
+            </div>
+          </div>
         </el-form-item>
 
         <el-form-item :label="t('menu.menuType')" prop="type">
@@ -330,7 +343,7 @@
 import { useI18n } from "vue-i18n";
 import { useFullscreen } from "@vueuse/core";
 import { useAppStore } from "@/stores/app";
-import { DeviceEnum } from "@/enums/settings";
+import { DeviceEnum, supportedLanguages } from "@/enums/settings";
 import MenuAPI from "@/api/system/menu";
 import type { MenuQueryParams, MenuForm, MenuItem } from "@/api/system/menu";
 import type { OptionItem } from "@/api/common";
@@ -369,7 +382,7 @@ const initialFormData: MenuForm = {
   parentId: undefined,
   type: MenuTypeEnum.MENU,
   name: "",
-  title: "",
+  titles: { 'zh-cn': '', en: '' },
   path: "",
   component: "",
   redirect: "",
@@ -413,7 +426,19 @@ const needsVisibility = computed(
 );
 
 const rules = computed<FormRules>(() => ({
-  title: [{ required: true, message: t("menu.messages.enterTitle"), trigger: "blur" }],
+  titles: [
+    {
+      required: true,
+      validator: (_rule, value, callback) => {
+        if (!value?.['zh-cn']?.trim()) {
+          callback(new Error(t("menu.messages.enterTitle")));
+        } else {
+          callback();
+        }
+      },
+      trigger: "blur",
+    },
+  ],
   type: [{ required: true, message: t("menu.messages.selectType"), trigger: "blur" }],
   name: [{ required: true, message: t("menu.messages.enterRouteName"), trigger: "blur" }],
   path: [{ required: true, message: t("menu.messages.enterRoutePath"), trigger: "blur" }],
@@ -464,7 +489,7 @@ async function openDialog(parentId?: string, menuId?: string): Promise<void> {
     formData.parentId = detail.parentId ?? undefined;
     formData.type = detail.type;
     formData.name = detail.name;
-    formData.title = detail.title;
+    formData.titles = { ...(detail.titles ?? { 'zh-cn': '', en: '' }) };
     formData.path = detail.path ?? "";
     formData.component = detail.component ?? "";
     formData.redirect = detail.redirect ?? "";
@@ -479,6 +504,7 @@ async function openDialog(parentId?: string, menuId?: string): Promise<void> {
     dialogState.title = t("menu.addMenu");
     editingId.value = undefined;
     Object.assign(formData, initialFormData);
+    formData.titles = { 'zh-cn': '', en: '' };
     formData.parentId = parentId;
   }
 }
@@ -541,6 +567,7 @@ function closeDialog(): void {
   menuFormRef.value?.clearValidate();
   editingId.value = undefined;
   Object.assign(formData, initialFormData);
+  formData.titles = { 'zh-cn': '', en: '' };
 }
 
 onMounted(() => {

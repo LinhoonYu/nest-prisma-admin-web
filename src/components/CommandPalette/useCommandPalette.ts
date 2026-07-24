@@ -1,7 +1,7 @@
 /**
  * 菜单搜索逻辑
  */
-import { ref, onMounted, onBeforeUnmount, toRaw } from "vue";
+import { ref, watch, onMounted, onBeforeUnmount, toRaw } from "vue";
 import { RouteRecordRaw, LocationQueryRaw } from "vue-router";
 import router from "@/router";
 import { usePermissionStore } from "@/stores";
@@ -193,6 +193,15 @@ export function useCommandPalette() {
     loadHistory();
     document.addEventListener("keydown", handleKeydown);
   });
+
+  // 语言切换后路由会重新拉取，重建搜索索引
+  watch(
+    () => permissionStore.routes,
+    () => {
+      menuItems.value = [];
+      loadRoutes(permissionStore.routes);
+    },
+  );
 
   onBeforeUnmount(() => {
     document.removeEventListener("keydown", handleKeydown);

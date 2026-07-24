@@ -5,20 +5,7 @@
     "profile": "个人中心",
     "myNotice": "我的通知",
     "demoDetail": "详情页缓存",
-    "dictData": "字典数据",
-    "System": "系统管理",
-    "User": "用户管理",
-    "Role": "角色管理",
-    "SysMenu": "菜单管理",
-    "Permission": "权限管理",
-    "Dept": "部门管理",
-    "App": "应用设置",
-    "Dict": "字典管理",
-    "Notice": "通知管理",
-    "Config": "系统设置",
-    "Log": "日志中心",
-    "LoginLog": "登录日志",
-    "OperationLog": "操作日志"
+    "dictData": "字典数据"
   },
   "login": {
     "themeToggle": "主题切换",

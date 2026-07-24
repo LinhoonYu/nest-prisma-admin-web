@@ -5,20 +5,7 @@
     "profile": "Profile",
     "myNotice": "My Notices",
     "demoDetail": "Detail Cache",
-    "dictData": "Dict Data",
-    "System": "System",
-    "User": "User Management",
-    "Role": "Role Management",
-    "SysMenu": "Menu Management",
-    "Permission": "Permission Management",
-    "Dept": "Department Management",
-    "App": "App Settings",
-    "Dict": "Dict Management",
-    "Notice": "Notice Management",
-    "Config": "System Config",
-    "Log": "Log Center",
-    "LoginLog": "Login Log",
-    "OperationLog": "Operation Log"
+    "dictData": "Dict Data"
   },
   "login": {
     "themeToggle": "Theme Switch",

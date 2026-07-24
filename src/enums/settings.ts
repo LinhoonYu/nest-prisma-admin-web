@@ -128,6 +128,11 @@ export const enum LanguageEnum {
   EN = "en",
 }
 
+export const supportedLanguages = [
+  { label: "中文", value: LanguageEnum.ZH_CN },
+  { label: "English", value: LanguageEnum.EN },
+] as const;
+
 /**
  * 设备枚举
  */

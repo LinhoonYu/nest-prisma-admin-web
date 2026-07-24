@@ -18,7 +18,8 @@
 
 <script setup lang="ts">
 import { useAppStore } from "@/stores/app";
-import { LanguageEnum } from "@/enums/settings";
+import { usePermissionStoreHook } from "@/stores/permission";
+import { supportedLanguages } from "@/enums/settings";
 
 defineProps({
   size: {
@@ -27,10 +28,7 @@ defineProps({
   },
 });
 
-const langOptions = [
-  { label: "中文", value: LanguageEnum.ZH_CN },
-  { label: "English", value: LanguageEnum.EN },
-];
+const langOptions = supportedLanguages;
 
 const appStore = useAppStore();
 const { locale, t } = useI18n();
@@ -43,6 +41,9 @@ const { locale, t } = useI18n();
 function handleLanguageChange(lang: string) {
   locale.value = lang;
   appStore.changeLanguage(lang);
+
+  // 重新拉取菜单树，后端会返回新语言的 title
+  usePermissionStoreHook().reloadDynamicRoutesOnce();
 
   ElMessage.success(t("langSelect.message.success"));
 }

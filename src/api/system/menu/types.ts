@@ -36,8 +36,10 @@ export interface MenuItem {
   type: number;
   /** 路由名称（唯一） */
   name: string;
-  /** 显示标题 */
+  /** 显示标题（后端按 locale 解析） */
   title: string;
+  /** 多语言标题（原始数据，编辑用） */
+  titles: Record<string, string>;
   /** 路由路径 */
   path: string | null;
   /** 组件路径 */
@@ -76,8 +78,8 @@ export interface MenuForm {
   type: number;
   /** 路由名称（唯一） */
   name: string;
-  /** 显示标题 */
-  title: string;
+  /** 多语言标题 */
+  titles: Record<string, string>;
   /** 路由路径 */
   path?: string;
   /** 组件路径 */
